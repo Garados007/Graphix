@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Objects>
+  <Imports>
+    <File name="visual-imports" />
+  </Imports>
+  <Prototype object-name="Background" base="DisplayBase">
+    <Container>
+      <Image name="background-image">
+        <Url ref="@ImageUrl" />
+        <X value="0" /> 
+        <Y value="0" />
+        <Width value="100%w" />
+        <Height value="100%h" />
+      </Image>
+    </Container>
+    <Parameter>
+      <String name="ImageUrl" />
+    </Parameter>
+    <X value="0" />
+    <Y value="0" />
+    <Width value="100%w" />
+    <Height value="100%h" />
+  </Prototype>
+  <Prototype object-name="Button" base="DisplayBase">
+    <Container>
+      <Background name="background">
+        <ImageUrl ref="@BackgroundImageUrl" />
+      </Background>
+      <Text name="caption">
+        <Text ref="@CaptionText" />
+        <X value="0" />
+        <Y value="0" />
+        <Width value="100%w" />
+        <Height value="100%h" />
+        <Align value="Center" />
+        <Valign value="Center" />
+        <ForeColor ref="@TextColor" />
+        <FontSize ref="@TextSize" />
+      </Text>
+      <Rect name="border">
+        <X value="0" />
+        <Y value="0" />
+        <Width value="100%w" />
+        <Height value="100%h" />
+        <ForeColor ref="@BorderColor" />
+        <LineWidth ref="@BorderWidth" />
+      </Rect>
+    </Container>
+    <Parameter>
+      <String name="BackgroundImageUrl" />
+      <String name="CaptionText" />
+      <Color name="BorderColor" value="Black" />
+      <Color name="TextColor" value="Black" />
+      <Double name="BorderWidth" value="1" />
+      <ScreenPos name="TextSize" value="16" />
+    </Parameter>
+  </Prototype>
+</Objects>

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--In this tree all the visual stuff is defined-->
+<Objects>
+  <!--Here are all the phases defined that the application can have-->
+  <Status>
+    <Value>Main</Value>
+  </Status>
+  
+  <!--Here are all import scripts for ui defined-->
+  <Imports>
+    <!--Main ui blocks from the official Graphix Library-->
+    <File name="visual-blocks" />
+  </Imports>
+  
+  <!--Define one visual Button-->
+  <Button name="demobutton">
+    <!--Initialize parent parameters-->
+    <CaptionText value="Demo of Graphix Framework" />
+    <X value="10%w" />
+    <Y value="20%h" />
+    <Width value="50%w" />
+    <Height value="50%h" />
+    <BorderColor value="yellow" />
+    <BorderWidth value="10" />
+    <TextColor value="green" />
+    <TextSize value="100" />
+    <!--setup Animations for this button-->
+    <Animation>
+      <!--Move Button to the right-->
+      <Group name="button-right">
+        <Activation>
+          <StatusChange new="Main" />
+        </Activation>
+        <Effects timing="1">
+          <AScreenPos param="X" value-change="30%w" time-duration="5" mode="Swing" />
+        </Effects>
+      </Group>
+      <!--Move button to the left-->
+      <Group name="button-left">
+        <Activation>
+        </Activation>
+        <Effects timing="1">
+          <AScreenPos param="X" value-change="-30%w" time-duration="5" mode="Swing" />
+          <Call effect="button-right" timing="1" time-start="5" asnyc="true" />
+        </Effects>
+      </Group>
+      <!--change color on click-->
+      <Group name="click-activator2">
+        <Activation>
+        </Activation>
+        <Effects timing="1">
+          <AColor param="TextColor" time-duration="0.5" value-finish="red" />
+          <AColor param="TextColor" time-duration="0.5" value-finish="green" />
+        </Effects>
+      </Group>
+      <Group name="click-activator">
+        <Activation>
+          <Click />
+        </Activation>
+        <Effects timing="1">
+          <ABool param="clickmod" value-finish="@inv-clickmod" />
+          <Call effect="click-activator2" timing="1" enable="@inv-clickmod" />
+          <AColor param="BorderColor" time-duration="0.5" value-finish="red" />
+          <AColor param="BorderColor" time-duration="0.5" value-finish="yellow" />
+        </Effects>
+      </Group>
+    </Animation>
+    <!--Define new parameters-->
+    <Parameter>
+      <!--these parameters are used in the animation-->
+      <Bool name="clickmod" value="true" />
+      <Math name="inv-clickmod" type="Bool">
+        <Calc method="not" type="Bool">
+          <Bool ref="@clickmod" />
+        </Calc>
+      </Math>
+    </Parameter>
+  </Button>
+  
+  <!--its possible to add an animation to an existing block-->
+  <Animation target="object" targetname="demobutton">
+    <Group extend="button-right" extendtype="append">
+      <Effects>
+        <Call effect="button-left" timing="1" time-start="5" async="true" />
+      </Effects>
+    </Group>
+  </Animation>
+</Objects>

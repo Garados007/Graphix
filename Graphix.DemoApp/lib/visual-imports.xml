@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+      GRAPHIX LIBRARY
+      This Library contains the references and imports of the core ui prototypes
+-->
+<Objects>
+  
+  <!--this is the base of all elements in the ui.
+      PrototypeBase contains the prototype container, animations and the parameters
+  -->
+  <Prototype object-name="PrototypeBase" dotnet="Graphix.Prototypes.PrototypeBase" />
+  
+  <!--This is the base of all positional elements.
+      DisplayBase is an extension of PrototypeBase and contains Messurements-Info.
+  -->
+  <Prototype object-name="DisplayBase" dotnet="Graphix.Prototypes.DisplayBase" />
+  
+  <!--This is the base of colored elements.
+      RenderingBase is an extension of DisplayBase.
+  -->
+  <Prototype object-name="RenderingBase" dotnet="Graphix.Prototypes.RenderingBase" />
+  
+  
+  
+  
+  <!--Draws an ellipse on the screen.
+      Ellipse is an extension of RenderingBase.
+  -->
+  <Prototype object-name="Ellipse" dotnet="Graphix.Prototypes.Ellipse" />
+  
+  <!--Draws an image on the screen.
+      Image is an extension of DisplayBase.
+  -->
+  <Prototype object-name="Image" dotnet="Graphix.Prototypes.Image" />
+  
+  <!--Draws a single line on the screen.
+      Line is an extension of RenderingBase.
+  -->
+  <Prototype object-name="Line" dotnet="Graphix.Prototypes.Line" />
+  
+  <!--Draws a single rectangle on the screen.
+      Rect is an extension of RenderingBase.
+  -->
+  <Prototype object-name="Rect" dotnet="Graphix.Prototypes.Rect" />
+  
+  <!--Draws a single string on the screen.
+      Text is an extension of RenderingBase.
+  -->
+  <Prototype object-name="Text" dotnet="Graphix.Prototypes.Text" />
+  
+  <!--Draws an animation of multiple image files. Its Url points to a directory of
+      single image files.
+      Anim is an extension of Image.
+  -->
+  <Prototype object-name="Anim" dotnet="Graphix.Prototypes.AnimImage" />
+</Objects>
