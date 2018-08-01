@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+      GRAPHIX LIBRARY
+      This Library contains same usefull blocks that can used in any ui definition
+-->
 <Objects>
   <Imports>
+    <!--Import the references to the core-->
     <File name="visual-imports" />
   </Imports>
+  
+  <!--This prototype can used as a background-->
   <Prototype object-name="Background" base="DisplayBase">
     <Container>
       <Image name="background-image">
@@ -14,13 +21,20 @@
       </Image>
     </Container>
     <Parameter>
+      <!--the url to the image file-->
       <String name="ImageUrl" />
     </Parameter>
+    <!--X coordinate of this background-->
     <X value="0" />
+    <!--Y coordinate of this background-->
     <Y value="0" />
+    <!--width of this background-->
     <Width value="100%w" />
+    <!--height of this background-->
     <Height value="100%h" />
   </Prototype>
+  
+  <!--This prototype can used as a button-->
   <Prototype object-name="Button" base="DisplayBase">
     <Container>
       <Background name="background">
@@ -47,11 +61,17 @@
       </Rect>
     </Container>
     <Parameter>
+      <!--url to the image file for the background-->
       <String name="BackgroundImageUrl" />
+      <!--text for the caption-->
       <String name="CaptionText" />
+      <!--color of the border-->
       <Color name="BorderColor" value="Black" />
+      <!--color of the text-->
       <Color name="TextColor" value="Black" />
+      <!--width of the border-->
       <Double name="BorderWidth" value="1" />
+      <!--the font size of the text-->
       <ScreenPos name="TextSize" value="16" />
     </Parameter>
   </Prototype>

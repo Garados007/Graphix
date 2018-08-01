@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Graphix.Prototypes.Math;
 
 namespace Graphix
 {
+    /// <summary>
+    /// Exports a loaded prototype into an ui XML definition. The definition contains only fully definied 
+    /// objects and no real prototypes or cross-references
+    /// </summary>
     public class PrototypeExporter
     {
+        /// <summary>
+        /// Value comparerer
+        /// </summary>
         class IValueWrapperComparer : IEqualityComparer<IValueWrapper>
         {
             public bool Equals(IValueWrapper x, IValueWrapper y)
@@ -23,6 +27,9 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Usage counter
+        /// </summary>
         class Counter
         {
             public long Id { get; set; }
@@ -30,27 +37,56 @@ namespace Graphix
             public long Usage { get; set; }
         }
 
+        /// <summary>
+        /// Converting information
+        /// </summary>
         public class Dict
         {
+            /// <summary>
+            /// List of all values and their ids
+            /// </summary>
             public Dictionary<IValueWrapper, long> ValueWrapper = new Dictionary<IValueWrapper, long>(new IValueWrapperComparer());
 
+            /// <summary>
+            /// List of all groups and their ids
+            /// </summary>
             public Dictionary<Physic.AnimationGroup, long> Groups = new Dictionary<Physic.AnimationGroup, long>();
 
+            /// <summary>
+            /// List of all system values and their names
+            /// </summary>
             public Dictionary<IValueWrapper, string> SystemValues = PrototypeLoader.SystemValues.ToDictionary((p) => p.Value, (p) => p.Key, new IValueWrapperComparer());
 
+            /// <summary>
+            /// Counter for Animation Groups
+            /// </summary>
             public long Counter;
         }
 
+        /// <summary>
+        /// List of all objects
+        /// </summary>
         public List<FlatPrototype> Objects { get; private set; }
 
+        /// <summary>
+        /// List of all status
+        /// </summary>
         public Dictionary<string, Status> Status { get; private set; }
 
+        /// <summary>
+        /// Exports a loaded prototype into an ui XML definition. The definition contains only fully definied 
+        /// objects and no real prototypes or cross-references
+        /// </summary>
         public PrototypeExporter()
         {
             Objects = new List<FlatPrototype>();
             Status = new Dictionary<string, Status>();
         }
 
+        /// <summary>
+        /// Import the flatten objects from the <see cref="PrototypeLoader"/>
+        /// </summary>
+        /// <param name="loader">the loader with the ui data</param>
         public void ImportFlatten(PrototypeLoader loader)
         {
             Objects.AddRange(loader.Objects.ToList().ConvertAll((p) => p.Value.Flatten()));
@@ -58,6 +94,10 @@ namespace Graphix
                 Status[s.Key] = s.Value;
         }
 
+        /// <summary>
+        /// Convert the loaded prototype to a XML document
+        /// </summary>
+        /// <returns>xml document</returns>
         public XmlDocument MakeXmlDom()
         {
             var xml = new XmlDocument();
@@ -71,6 +111,10 @@ namespace Graphix
             return xml;
         }
 
+        /// <summary>
+        /// Save the flattened dom to a ui XML definition file
+        /// </summary>
+        /// <param name="file"></param>
         public void SaveFlatDom(string file)
         {
             var dir = new System.IO.FileInfo(file).Directory;
@@ -79,6 +123,11 @@ namespace Graphix
             xml.Save(file);
         }
 
+        /// <summary>
+        /// Exports all status infos
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
         void ExportStatus(XmlDocument xml, XmlNode target)
         {
             var node = target.AppendChild(xml.CreateElement("Status"));
@@ -91,6 +140,13 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Exports status with root
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
+        /// <param name="status">current status</param>
+        /// <param name="extend">root</param>
         void ExportStatus(XmlDocument xml, XmlNode target, Status status, string extend)
         {
             var node = target.AppendChild(xml.CreateElement("Status"));
@@ -105,6 +161,11 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Export all types
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
         void ExportTypes(XmlDocument xml, XmlNode target)
         {
             var types = new List<string>();
@@ -117,6 +178,11 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Exports all objects
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
         void ExportObjects(XmlDocument xml, XmlNode target)
         {
             var dict = new Dict();
@@ -132,6 +198,11 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Filters used values and add them to the dictionary
+        /// </summary>
+        /// <param name="search">the reference search result</param>
+        /// <param name="dict">reference dictionary</param>
         void Filter(Dictionary<IValueWrapper, Counter> search, Dictionary<IValueWrapper, long> dict)
         {
             foreach (var e in search)
@@ -139,6 +210,11 @@ namespace Graphix
                     dict.Add(e.Key, e.Value.Id);
         }
 
+        /// <summary>
+        /// Find all used types if renderer in the prototype
+        /// </summary>
+        /// <param name="flat">prototype</param>
+        /// <param name="types">current list to extend</param>
         void FindTypes(FlatPrototype flat, List<string> types)
         {
             if (!types.Contains(flat.RenderName))
@@ -147,6 +223,12 @@ namespace Graphix
                 FindTypes(s, types);
         }
 
+        /// <summary>
+        /// lookup for all referencing stuff in the prototype
+        /// </summary>
+        /// <param name="flat">current prototype</param>
+        /// <param name="dict">reference dictionary for values</param>
+        /// <param name="d">reference dictionary</param>
         void CreateLookup(FlatPrototype flat, Dictionary<IValueWrapper, Counter> dict, Dict d)
         {
             foreach (var sub in flat.Container) CreateLookup(sub, dict, d);
@@ -165,6 +247,12 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Lookup for variable usage in a parameter
+        /// </summary>
+        /// <param name="p">current value</param>
+        /// <param name="dict">reference dictionary for values</param>
+        /// <param name="d">reference dictionary</param>
         void LookupParam(IValueWrapper p, Dictionary<IValueWrapper, Counter> dict, Dict d)
         {
             if (p.Name == "Math")
@@ -181,6 +269,11 @@ namespace Graphix
                 }
         }
 
+        /// <summary>
+        /// Lookup for variable usage in math parameter
+        /// </summary>
+        /// <param name="p">current value</param>
+        /// <param name="dict">reference dictionary for values</param>
         void LookupMathParam(IValueWrapper p, Dictionary<IValueWrapper, Counter> dict)
         {
             if (p is Calc)
@@ -209,6 +302,13 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Create the object node
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="flat">current prototype</param>
+        /// <param name="dict">reference dictionary</param>
+        /// <returns></returns>
         XmlNode CreateObjectNode(XmlDocument xml, FlatPrototype flat, Dict dict)
         {
             var node = xml.CreateElement(flat.RenderName);
@@ -219,6 +319,13 @@ namespace Graphix
             return node;
         }
 
+        /// <summary>
+        /// Create the container of an object
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
+        /// <param name="flat">current prototype</param>
+        /// <param name="dict">reference dictionary</param>
         void CreateContainer(XmlDocument xml, XmlNode target, FlatPrototype flat, Dict dict)
         {
             if (flat.Container.Count == 0) return;
@@ -227,6 +334,13 @@ namespace Graphix
                 node.AppendChild(CreateObjectNode(xml, sub, dict));
         }
 
+        /// <summary>
+        /// Creates the animations of an object
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
+        /// <param name="flat">current prototype</param>
+        /// <param name="dict">reference dictionary</param>
         void CreateAnimations(XmlDocument xml, XmlNode target, FlatPrototype flat, Dict dict)
         {
             if (flat.Animations.Count == 0) return;
@@ -256,6 +370,13 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Creates the parameter of an object
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">current node</param>
+        /// <param name="flat">current prototype</param>
+        /// <param name="dict">reference dictionary</param>
         void CreateParameter(XmlDocument xml, XmlNode target, FlatPrototype flat, Dict dict)
         {
             if (flat.Parameter.Count == 0) return;
@@ -282,6 +403,14 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// creates the math parameter
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">target node</param>
+        /// <param name="value">current value</param>
+        /// <param name="dict">reference dictionary</param>
+        /// <returns>current node</returns>
         XmlNode CreateMathParameter(XmlDocument xml, XmlNode target, IValueWrapper value, Dict dict)
         {
             var node = target.AppendChild(xml.CreateElement("Math"));
@@ -291,6 +420,14 @@ namespace Graphix
             return node;
         }
 
+        /// <summary>
+        /// creates the math dependent parameter
+        /// </summary>
+        /// <param name="xml">xml target</param>
+        /// <param name="target">target node</param>
+        /// <param name="value">current value</param>
+        /// <param name="dict">reference dictionary</param>
+        /// <returns>current node</returns>
         void CreateMathSubParameter(XmlDocument xml, XmlNode target, IValueWrapper value, Dict dict)
         {
             if (value is Calc)
@@ -336,6 +473,13 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// loads the value of a parameter
+        /// </summary>
+        /// <param name="v">current value</param>
+        /// <param name="dict">reference dictionary</param>
+        /// <param name="enableDirect">enable direct referencing</param>
+        /// <returns>string representation of parameter</returns>
         public static string GetParamValue(IValueWrapper v, Dict dict, bool enableDirect = true)
         {
             if (!enableDirect)

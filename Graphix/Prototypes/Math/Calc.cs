@@ -1,26 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Graphix.Prototypes.Math
 {
+    /// <summary>
+    /// Calculates a value using an operator
+    /// </summary>
     public class Calc : IValueWrapper
     {
+        /// <summary>
+        /// The result value of the calculation
+        /// </summary>
         public object Value { get => bufcalc(); set { } }
+        /// <summary>
+        /// unused
+        /// </summary>
         public IValueWrapper RemoteSource { get => null; set { } }
+        /// <summary>
+        /// The name of this Value (should be "Calc")
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Define if the real value of this value object exists
+        /// </summary>
         public bool Exists { get; set; }
-
+        /// <summary>
+        /// The calculation method that is used
+        /// </summary>
         public CalcMethod Method { get; set; }
-
+        /// <summary>
+        /// The result type of this calculation
+        /// </summary>
         public CalcType Type { get; set; }
-
+        /// <summary>
+        /// If Precompile is on then this value is calculated only once.
+        /// If Precompile is off then this value is calculated each time.
+        /// </summary>
         public bool Precompile { get; set; }
 
+        /// <summary>
+        /// The List of values that are used in this calculation
+        /// </summary>
         public List<IValueWrapper> ValueList { get; private set; }
 
+        /// <summary>
+        /// Creates a new value that can calculate its result using an operator
+        /// </summary>
         public Calc()
         {
             ValueList = new List<IValueWrapper>();
@@ -38,6 +63,10 @@ namespace Graphix.Prototypes.Math
             else return calc();
         }
 
+        /// <summary>
+        /// calculate the value
+        /// </summary>
+        /// <returns>the result</returns>
         private object calc()
         {
             switch (Type)
@@ -262,6 +291,10 @@ namespace Graphix.Prototypes.Math
             return null;
         }
 
+        /// <summary>
+        /// Check if the combination of <see cref="Method"/> and <see cref="Type"/> are valid.
+        /// </summary>
+        /// <returns>true if the combination is valid</returns>
         public bool ValidMethod()
         {
             switch (Type)
@@ -315,6 +348,10 @@ namespace Graphix.Prototypes.Math
             return false;
         }
 
+        /// <summary>
+        /// Clone this value completely
+        /// </summary>
+        /// <returns>the cloned result</returns>
         public IValueWrapper Clone()
         {
             var calc = new Calc();
@@ -327,6 +364,10 @@ namespace Graphix.Prototypes.Math
             return calc;
         }
 
+        /// <summary>
+        /// Move the targets of its values using the helper
+        /// </summary>
+        /// <param name="helper">The flattened helper</param>
         public void MoveTargets(PrototypeFlattenerHelper helper)
         {
             for (int i = 0; i<ValueList.Count; ++i)
@@ -338,33 +379,106 @@ namespace Graphix.Prototypes.Math
         }
     }
 
+    /// <summary>
+    /// The method for the calculation in <see cref="Calc"/>
+    /// </summary>
     public enum CalcMethod
     {
+        /// <summary>
+        /// Add (+)
+        /// </summary>
         add,
+        /// <summary>
+        /// Subtract (-)
+        /// </summary>
         sub,
+        /// <summary>
+        /// Multiply (*)
+        /// </summary>
         mult,
+        /// <summary>
+        /// Divide (/)
+        /// </summary>
         div,
+        /// <summary>
+        /// Negate (-)
+        /// </summary>
         neg,
+        /// <summary>
+        /// Boolean and
+        /// </summary>
         and,
+        /// <summary>
+        /// Boolean or
+        /// </summary>
         or,
+        /// <summary>
+        /// Boolean xor
+        /// </summary>
         xor,
+        /// <summary>
+        /// Boolean nor
+        /// </summary>
         nor,
+        /// <summary>
+        /// Boolean xnor
+        /// </summary>
         xnor,
+        /// <summary>
+        /// Boolean not
+        /// </summary>
         not,
+        /// <summary>
+        /// Boolean nand
+        /// </summary>
         nand,
+        /// <summary>
+        /// Concat two strings
+        /// </summary>
         concat,
+        /// <summary>
+        /// Power of two numbers
+        /// </summary>
         pow,
+        /// <summary>
+        /// transform double to the result type
+        /// </summary>
         fromDouble,
+        /// <summary>
+        /// transform int to the result type
+        /// </summary>
         fromInt,
+        /// <summary>
+        /// transform bool to the result type
+        /// </summary>
         fromBool,
+        /// <summary>
+        /// transform string to the result type
+        /// </summary>
         fromString
     }
 
+
+    /// <summary>
+    /// The result type for the calculation in <see cref="Calc"/>
+    /// </summary>
     public enum CalcType
     {
+        /// <summary>
+        /// Double value (e.g. 3.14)
+        /// </summary>
         Double,
+        /// <summary>
+        /// Integer value (e.g. 42)
+        /// </summary>
         Int,
+        /// <summary>
+        /// Boolean value (e.g. true)
+        /// </summary>
         Bool,
+        /// <summary>
+        /// String value (e.g. "abc")
+        /// </summary>
         String
     }
 }

@@ -1,31 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
 using Graphix.Prototypes;
 
 namespace Graphix.Physic
 {
+    /// <summary>
+    /// Activates an Animation automaticly
+    /// </summary>
     public abstract class AnimationActivation
     {
+        /// <summary>
+        /// Enables this activation. Disabled this activation has no effect.
+        /// </summary>
         public ValueWrapper<bool> Enabled { get; set; }
 
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
         public abstract XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict);
 
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
         public abstract IValueWrapper[] GetValueWrapper();
 
+        /// <summary>
+        /// helper method to add a parameter to this node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the result node</param>
+        /// <param name="param">the value</param>
+        /// <param name="name">name of the value</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
         protected void AddParamToXml(XmlDocument xml, XmlNode node, IValueWrapper param, string name, PrototypeExporter.Dict dict)
         {
             if (param.Exists)
                 node.Attributes.Append(xml.CreateAttribute(name)).Value = PrototypeExporter.GetParamValue(param, dict);
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public abstract void MoveTargets(PrototypeFlattenerHelper helper);
 
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
         public abstract AnimationActivation Clone();
 
+        /// <summary>
+        /// Creates a new Activation
+        /// </summary>
         public AnimationActivation()
         {
             Enabled = new ValueWrapper<bool>();
@@ -34,18 +64,36 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// This Activation activates the Animation when the status has been changed
+    /// </summary>
     public class StatusChange : AnimationActivation
     {
+        /// <summary>
+        /// The old status if set
+        /// </summary>
         public ValueWrapper<Status> Old { get; set; }
 
+        /// <summary>
+        /// The new status if set
+        /// </summary>
         public ValueWrapper<Status> New { get; set; }
 
+        /// <summary>
+        /// Creates an Activator that activates an animation when the status has been changed
+        /// </summary>
         public StatusChange()
         {
             Old = new ValueWrapper<Status>();
             New = new ValueWrapper<Status>();
         }
 
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("StatusChange");
@@ -55,6 +103,10 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -63,6 +115,10 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             Old = helper.Convert(Old);
@@ -70,6 +126,10 @@ namespace Graphix.Physic
             Enabled = helper.Convert(Enabled);
         }
 
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
         public override AnimationActivation Clone()
         {
             var act = new StatusChange();
@@ -80,10 +140,22 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// This Activator actives an animation when an another animation has been finished
+    /// </summary>
     public class AfterAnimation : AnimationActivation
     {
+        /// <summary>
+        /// The other animation after that this animation should be called
+        /// </summary>
         public AnimationGroup Effect { get; set; }
 
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AfterAnimation");
@@ -92,6 +164,10 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[] 
@@ -100,12 +176,20 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             Effect = helper.Convert(Effect);
             Enabled = helper.Convert(Enabled);
         }
 
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
         public override AnimationActivation Clone()
         {
             var act = new AfterAnimation();
@@ -115,14 +199,28 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// An activator that actives an animation after its block was clicked
+    /// </summary>
     public class ClickAnimation : AnimationActivation
     {
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("Click");
             AddParamToXml(xml, node, Enabled, "enable", dict);
             return node;
         }
+
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -131,11 +229,19 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             Enabled = helper.Convert(Enabled);
         }
 
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
         public override AnimationActivation Clone()
         {
             var act = new ClickAnimation();

@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes
+﻿namespace Graphix.Prototypes
 {
+    /// <summary>
+    /// Prototype for a single line
+    /// </summary>
     public class Line : RenderingBase
     {
+        /// <summary>
+        /// The second x coordinate of this line
+        /// </summary>
         public ValueWrapper<ScreenPos> X2 { get; private set; }
+        /// <summary>
+        /// The second y coordinate of this line
+        /// </summary>
         public ValueWrapper<ScreenPos> Y2 { get; private set; }
-        
 
+        /// <summary>
+        /// Creates a Prototype for a single line
+        /// </summary>
         public Line()
         {
             RenderName = GetType().FullName;

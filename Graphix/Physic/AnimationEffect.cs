@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -9,26 +8,63 @@ using Color = System.Drawing.Color;
 
 namespace Graphix.Physic
 {
+    /// <summary>
+    /// Defines the Effect that should be done when its Animation is called
+    /// </summary>
     public abstract class AnimationEffect
     {
+        /// <summary>
+        /// The start time when this effect is called. Its the time since the
+        /// complete start of this animation sequence
+        /// </summary>
         public ValueWrapper<double> TimeStart { get; set; }
 
+        /// <summary>
+        /// The offset time when this effect is called. It's the time since the
+        /// execution of the previous effect
+        /// </summary>
         public ValueWrapper<double> TimeOffset { get; set; }
 
+        /// <summary>
+        /// The time when this effect should be finished. It's the time since the
+        /// complete start of this animation sequence.
+        /// </summary>
         public ValueWrapper<double> TimeFinish { get; set; }
 
+        /// <summary>
+        /// The time this effect should durate. Its the time since the start of
+        /// this effect.
+        /// </summary>
         public ValueWrapper<double> TimeDuration { get; set; }
 
+        /// <summary>
+        /// Determine if this effect should be executed in reverse direction.
+        /// </summary>
         public ValueWrapper<bool> Reverse { get; set; }
 
+        /// <summary>
+        /// The amount of how often this effect should be executed
+        /// </summary>
         public ValueWrapper<RepeatMode> Repeat { get; set; }
 
+        /// <summary>
+        /// The timing curve for this effect
+        /// </summary>
         public ValueWrapper<AnimationMode> Mode { get; set; }
 
+        /// <summary>
+        /// Run this effect asynchron from the the other effects. 
+        /// </summary>
         public ValueWrapper<bool> Async { get; set; }
 
+        /// <summary>
+        /// Enable this effect. If this effect is not enabled the execution whould be skipped to the next effect.
+        /// </summary>
         public ValueWrapper<bool> Enable { get; set; }
 
+        /// <summary>
+        /// Creates a new animation effect
+        /// </summary>
         public AnimationEffect()
         {
             TimeStart = new ValueWrapper<double>() { Exists = false };
@@ -42,16 +78,40 @@ namespace Graphix.Physic
             Enable = new ValueWrapper<bool>() { Value = true };
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public abstract XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict);
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public abstract IValueWrapper[] GetValueWrapper();
 
+        /// <summary>
+        /// Util function to add a parameter to the XML node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="param">value to export</param>
+        /// <param name="name">name of value</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected void AddParamToXml(XmlDocument xml, XmlNode node, IValueWrapper param, string name, PrototypeExporter.Dict dict)
         {
             if (param.Exists)
                 node.Attributes.Append(xml.CreateAttribute(name)).Value = PrototypeExporter.GetParamValue(param, dict);
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected virtual void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             AddParamToXml(xml, node, TimeStart, "time-start", dict);
@@ -65,6 +125,12 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, Enable, "enable", dict);
         }
 
+        /// <summary>
+        /// Apply the timing function to the progress
+        /// </summary>
+        /// <param name="value">The progress of execution (between 0 and 1)</param>
+        /// <param name="mode">the timing function</param>
+        /// <returns>The modified progress value</returns>
         public static double PerformMode(double value, AnimationMode mode)
         {
             if (value <= 0) return 0;
@@ -86,6 +152,10 @@ namespace Graphix.Physic
             }
         }
 
+        /// <summary>
+        /// Check if the effect could start
+        /// </summary>
+        /// <param name="data">runtime information</param>
         public virtual void CanStartAnimation(AnimationRuntimeData data)
         {
             if (TimeStart.Exists)
@@ -116,6 +186,10 @@ namespace Graphix.Physic
             }
         }
 
+        /// <summary>
+        /// Animate the current effect
+        /// </summary>
+        /// <param name="data">runtime data</param>
         public void Animate(AnimationRuntimeData data)
         {
             var time = data.CurrentTime - data.StartTime;
@@ -147,10 +221,22 @@ namespace Graphix.Physic
             if (Enable) Animate(final == 0 ? 1 : time / final);
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected abstract void Animate(double time);
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected abstract void StartAnimate(AnimationRuntime runtime); //store start value if neccesary
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public virtual void MoveTargets(PrototypeFlattenerHelper helper)
         {
             TimeStart = helper.Convert(TimeStart);
@@ -163,6 +249,10 @@ namespace Graphix.Physic
             Enable = helper.Convert(Enable);
         }
 
+        /// <summary>
+        /// Clones this effect completly.
+        /// </summary>
+        /// <returns>The clone</returns>
         public AnimationEffect Clone()
         {
             var eff = ProtClone();
@@ -177,38 +267,83 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected abstract AnimationEffect ProtClone();
     }
 
+    /// <summary>
+    /// Define how often an effect should be repeated
+    /// </summary>
     public struct RepeatMode
     {
+        /// <summary>
+        /// the number of times
+        /// </summary>
         public uint Times { get; set; }
 
+        /// <summary>
+        /// The effect should be infinity repeated
+        /// </summary>
         public bool Infinite { get => Times == uint.MaxValue; set => Times = uint.MaxValue; }
 
+        /// <summary>
+        /// This effect should never be repeated
+        /// </summary>
         public bool None { get => Times == 0; set => Times = 0; }
 
+        /// <summary>
+        /// Create RepeatMode, it defines how often an effect should be repeated
+        /// </summary>
+        /// <param name="times">
+        /// the amount of times this effect should be repeated (<see cref="uint.MaxValue"/> means 
+        /// infinite repeating)
+        /// </param>
         public RepeatMode(uint times)
         {
             Times = times;
         }
 
+        /// <summary>
+        /// converts the Value to a string
+        /// </summary>
+        /// <returns>the resulted string</returns>
         public override string ToString()
         {
             return None ? "none" : Infinite ? "infinite" : Times.ToString();
         }
     }
 
+    /// <summary>
+    /// Animates a double value
+    /// </summary>
     public class ADouble : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<double> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<double> ValueStart { get; set; }
 
+        /// <summary>
+        /// The amount this variable should be changed
+        /// </summary>
         public ValueWrapper<double> ValueChange { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<double> ValueFinish { get; set; }
 
+        /// <summary>
+        /// Animates a double value
+        /// </summary>
         public ADouble()
         {
             Target = new ValueWrapper<double>();
@@ -217,6 +352,10 @@ namespace Graphix.Physic
             ValueFinish = new ValueWrapper<double>() { Exists = false };
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new ADouble();
@@ -227,6 +366,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -236,6 +379,12 @@ namespace Graphix.Physic
             ValueFinish = helper.Convert(ValueFinish);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("ADouble");
@@ -243,6 +392,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -252,6 +407,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, ValueFinish, "value-finish", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -263,6 +422,10 @@ namespace Graphix.Physic
 
         double startValue;
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             double finish;
@@ -272,6 +435,10 @@ namespace Graphix.Physic
             Target.Value = startValue + (finish - startValue) * PerformMode(time, Mode);
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -280,16 +447,34 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// Animate an int value
+    /// </summary>
     public class AInt : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<int> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<int> ValueStart { get; set; }
 
+        /// <summary>
+        /// The amount this variable should be changed
+        /// </summary>
         public ValueWrapper<int> ValueChange { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<int> ValueFinish { get; set; }
 
+        /// <summary>
+        /// Animate an int value
+        /// </summary>
         public AInt()
         {
             Target = new ValueWrapper<int>();
@@ -298,6 +483,10 @@ namespace Graphix.Physic
             ValueFinish = new ValueWrapper<int>() { Exists = false };
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new AInt();
@@ -308,6 +497,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -317,6 +510,12 @@ namespace Graphix.Physic
             ValueFinish = helper.Convert(ValueFinish);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AInt");
@@ -324,6 +523,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -333,6 +538,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, ValueFinish, "value-finish", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -344,6 +553,10 @@ namespace Graphix.Physic
 
         double startValue;
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             double finish;
@@ -353,6 +566,10 @@ namespace Graphix.Physic
             Target.Value = (int)(startValue + (finish - startValue) * PerformMode(time, Mode));
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -361,14 +578,29 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// Animate a color
+    /// </summary>
     public class AColor : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<Color> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<Color> ValueStart { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<Color> ValueFinish { get; set; }
 
+        /// <summary>
+        /// Animate a color
+        /// </summary>
         public AColor()
         {
             Target = new ValueWrapper<Color>();
@@ -376,6 +608,10 @@ namespace Graphix.Physic
             ValueFinish = new ValueWrapper<Color>() { Exists = false };
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new AColor();
@@ -385,6 +621,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -393,6 +633,12 @@ namespace Graphix.Physic
             ValueFinish = helper.Convert(ValueFinish);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AColor");
@@ -400,6 +646,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -408,6 +660,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, ValueFinish, "value-finish", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -419,6 +675,10 @@ namespace Graphix.Physic
 
         Color startValue;
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             Color finish;
@@ -433,6 +693,10 @@ namespace Graphix.Physic
             );
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -441,17 +705,34 @@ namespace Graphix.Physic
         }
     }
 
-
+    /// <summary>
+    /// Animate a position on the screen
+    /// </summary>
     public class AScreenPos : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<ScreenPos> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<ScreenPos> ValueStart { get; set; }
 
+        /// <summary>
+        /// The amount this variable should be changed
+        /// </summary>
         public ValueWrapper<ScreenPos> ValueChange { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<ScreenPos> ValueFinish { get; set; }
 
+        /// <summary>
+        /// Animate a position on the screen
+        /// </summary>
         public AScreenPos()
         {
             Target = new ValueWrapper<ScreenPos>();
@@ -460,6 +741,10 @@ namespace Graphix.Physic
             ValueFinish = new ValueWrapper<ScreenPos>() { Exists = false };
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new AScreenPos();
@@ -470,6 +755,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -479,6 +768,12 @@ namespace Graphix.Physic
             ValueFinish = helper.Convert(ValueFinish);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AScreenPos");
@@ -486,6 +781,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -495,6 +796,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, ValueFinish, "value-finish", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -506,6 +811,10 @@ namespace Graphix.Physic
 
         ScreenPos startValue;
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             ScreenPos finish;
@@ -522,6 +831,10 @@ namespace Graphix.Physic
             else Target.Value = new ScreenPos(startValue.Value + (finish.Value - startValue.Value) * PerformMode(time, Mode), startValue.PosType);
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -530,14 +843,29 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// Animate a boolean value
+    /// </summary>
     public class ABool : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<bool> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<bool> ValueStart { get; set; }
-        
+
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<bool> ValueFinish { get; set; }
 
+        /// <summary>
+        /// Animate a boolean value
+        /// </summary>
         public ABool()
         {
             Target = new ValueWrapper<bool>();
@@ -545,6 +873,10 @@ namespace Graphix.Physic
             ValueFinish = new ValueWrapper<bool>() { Exists = false };
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new ABool();
@@ -554,6 +886,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -562,6 +898,12 @@ namespace Graphix.Physic
             ValueFinish = helper.Convert(ValueFinish);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("ABool");
@@ -569,6 +911,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -577,6 +925,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, ValueFinish, "value-finish", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -586,6 +938,10 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             var finish = ValueFinish.Exists ? ValueFinish.Value : startValue;
@@ -593,6 +949,10 @@ namespace Graphix.Physic
         }
 
         bool startValue;
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -601,16 +961,35 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// Animate a string
+    /// </summary>
     public class AString : AnimationEffect
     {
+        /// <summary>
+        /// The variable that should be changed
+        /// </summary>
         public ValueWrapper<string> Target { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the start of this animation
+        /// </summary>
         public ValueWrapper<string> ValueStart { get; set; }
 
+        /// <summary>
+        /// The value of the variable at the end of this animation
+        /// </summary>
         public ValueWrapper<string> ValueFinish { get; set; }
 
+        /// <summary>
+        /// If flipped the string was changed from right to left. Normaly it
+        /// would be replaced from left to right
+        /// </summary>
         public ValueWrapper<bool> Flip { get; set; }
 
+        /// <summary>
+        /// Animate a string
+        /// </summary>
         public AString()
         {
             Target = new ValueWrapper<string>();
@@ -619,6 +998,10 @@ namespace Graphix.Physic
             Flip = new ValueWrapper<bool>();
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new AString();
@@ -629,6 +1012,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -638,6 +1025,12 @@ namespace Graphix.Physic
             Flip = helper.Convert(Flip);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AString");
@@ -645,6 +1038,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -654,6 +1053,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, Flip, "flip", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -663,6 +1066,10 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             var finish = ValueFinish.Exists ? ValueFinish.Value : startValue;
@@ -687,6 +1094,10 @@ namespace Graphix.Physic
         }
 
         string startValue;
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             if (ValueStart.Exists)
@@ -695,17 +1106,33 @@ namespace Graphix.Physic
         }
     }
 
+    /// <summary>
+    /// Call an another animation
+    /// </summary>
     public class Call : AnimationEffect
     {
+        /// <summary>
+        /// The animation that should be called
+        /// </summary>
         public AnimationGroup Target { get; set; }
 
+        /// <summary>
+        /// The timing multipler this animation should be called
+        /// </summary>
         public ValueWrapper<double> Timing { get; set; }
 
+        /// <summary>
+        /// Call an another animation
+        /// </summary>
         public Call()
         {
             Timing = new ValueWrapper<double>();
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new Call();
@@ -714,6 +1141,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -721,6 +1152,12 @@ namespace Graphix.Physic
             Timing = helper.Convert(Timing);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("Call");
@@ -728,6 +1165,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -736,6 +1179,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, Timing, "timing", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -745,25 +1192,46 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             runtime.ExecuteAnimation(Target, Timing.Value);
         }
     }
 
+    /// <summary>
+    /// Set the current phase of the ui
+    /// </summary>
     public class SetState : AnimationEffect
     {
+        /// <summary>
+        /// The target state of the ui
+        /// </summary>
         public ValueWrapper<Status> State { get; set; }
 
+        /// <summary>
+        /// Set the current phase of the ui
+        /// </summary>
         public SetState()
         {
             State = new ValueWrapper<Status>();
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new SetState();
@@ -771,12 +1239,22 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
             State = helper.Convert(State);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("SetState");
@@ -784,12 +1262,22 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
             AddParamToXml(xml, node, State, "state", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -799,26 +1287,47 @@ namespace Graphix.Physic
             };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
             
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             runtime.CurrentStatus = State.Value;
         }
     }
 
+    /// <summary>
+    /// Execute a registered action
+    /// </summary>
     public class AnimAction : AnimationEffect
     {
+        /// <summary>
+        /// The name of the animation that should be called if the effect starts
+        /// </summary>
         public ValueWrapper<String> Name { get; set; }
 
+        /// <summary>
+        /// Execute a registered action
+        /// </summary>
         public AnimAction()
         {
             Name = new ValueWrapper<string>();
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new AnimAction();
@@ -826,12 +1335,22 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
             Name = helper.Convert(Name);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("AnimAction");
@@ -839,12 +1358,22 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
             AddParamToXml(xml, node, Name, "name", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -854,10 +1383,18 @@ namespace Graphix.Physic
                };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             var name = Name.Value;
@@ -865,20 +1402,40 @@ namespace Graphix.Physic
                 new Task(actions[name]).Start();
         }
 
+        /// <summary>
+        /// List of all registred actions
+        /// </summary>
         static Dictionary<string, Action> actions = new Dictionary<string, Action>();
 
+        /// <summary>
+        /// Registers an action that the ui can call if something happens
+        /// </summary>
+        /// <param name="name">the name of the action</param>
+        /// <param name="action">the method that would be called</param>
         public static void AddAction(string name, Action action)
         {
             actions[name] = action;
         }
     }
 
+    /// <summary>
+    /// Play a sound file
+    /// </summary>
     public class PlaySound : AnimationEffect
     {
+        /// <summary>
+        /// The path of the specific file
+        /// </summary>
         public ValueWrapper<String> File { get; set; }
 
+        /// <summary>
+        /// the volume of this sound (between 0 and 1)
+        /// </summary>
         public ValueWrapper<double> Volume { get; set; }
 
+        /// <summary>
+        /// Play a sound file
+        /// </summary>
         public PlaySound()
         {
             File = new ValueWrapper<string>();
@@ -886,6 +1443,10 @@ namespace Graphix.Physic
             Volume.Value = 1;
         }
 
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
         protected override AnimationEffect ProtClone()
         {
             var eff = new PlaySound();
@@ -894,6 +1455,10 @@ namespace Graphix.Physic
             return eff;
         }
 
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             base.MoveTargets(helper);
@@ -901,6 +1466,12 @@ namespace Graphix.Physic
             Volume = helper.Convert(Volume);
         }
 
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
         public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
         {
             var node = xml.CreateElement("Sound");
@@ -908,6 +1479,12 @@ namespace Graphix.Physic
             return node;
         }
 
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
         protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
         {
             base.AddParamsToXml(xml, node, dict);
@@ -915,6 +1492,10 @@ namespace Graphix.Physic
             AddParamToXml(xml, node, Volume, "volume", dict);
         }
 
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
         public override IValueWrapper[] GetValueWrapper()
         {
             return new IValueWrapper[]
@@ -924,10 +1505,18 @@ namespace Graphix.Physic
                };
         }
 
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
         }
 
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
             var name = File.Value;

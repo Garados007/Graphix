@@ -1,13 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Graphix.Physic
 {
+    /// <summary>
+    /// The sound player that can run some audio files
+    /// </summary>
     public interface ISoundPlayer : IDisposable
     {
+        /// <summary>
+        /// Play a specific sound file
+        /// </summary>
+        /// <param name="file">path to file</param>
+        /// <param name="volume">the volume this sound should played</param>
         void PlaySound(string file, double volume);
     }
 }

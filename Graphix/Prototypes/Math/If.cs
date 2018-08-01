@@ -1,24 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes.Math
+﻿namespace Graphix.Prototypes.Math
 {
+    /// <summary>
+    /// This Value returns one of two values based on a condition
+    /// </summary>
     public class If : IValueWrapper
     {
+        /// <summary>
+        /// The value of this branch
+        /// </summary>
         public object Value { get => bufcalc(); set { } }
+        /// <summary>
+        /// unused
+        /// </summary>
         public IValueWrapper RemoteSource { get => null; set { } }
+        /// <summary>
+        /// The name of this value (should be "If")
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Determines if the result of this value exists
+        /// </summary>
         public bool Exists { get; set; }
-        
+        /// <summary>
+        /// If Precompile is on then this value is calculated only once.
+        /// If Precompile is off then this value is calculated each time.
+        /// </summary>
         public bool Precompile { get; set; }
         
+        /// <summary>
+        /// The boolean value of an condition
+        /// </summary>
         public IValueWrapper Condition { get; set; }
-
+        /// <summary>
+        /// This value is returned if <see cref="Condition"/> returns true
+        /// </summary>
         public IValueWrapper True { get; set; }
-
+        /// <summary>
+        /// This value is returned if <see cref="Condition"/> returns false
+        /// </summary>
         public IValueWrapper False { get; set; }
 
 
@@ -34,6 +53,10 @@ namespace Graphix.Prototypes.Math
             else return calc();
         }
 
+        /// <summary>
+        /// Calculates the value
+        /// </summary>
+        /// <returns>the result of this branch</returns>
         private object calc()
         {
             var cond = Condition.Value;
@@ -47,6 +70,10 @@ namespace Graphix.Prototypes.Math
             else return False.Value;
         }
 
+        /// <summary>
+        /// Clone this value completely
+        /// </summary>
+        /// <returns>the cloned result</returns>
         public IValueWrapper Clone()
         {
             var val = new If();
@@ -59,6 +86,10 @@ namespace Graphix.Prototypes.Math
             return val;
         }
 
+        /// <summary>
+        /// Move the targets of its values using the helper
+        /// </summary>
+        /// <param name="helper">The flattened helper</param>
         public void MoveTargets(PrototypeFlattenerHelper helper)
         {
             if (Condition != null)

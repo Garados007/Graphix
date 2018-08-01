@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes
+﻿namespace Graphix.Prototypes
 {
+    /// <summary>
+    /// Prototype for an ellipse
+    /// </summary>
     public class Ellipse : RenderingBase
     {
+        /// <summary>
+        /// Creates a Prototype for an ellipse
+        /// </summary>
         public Ellipse()
         {
             RenderName = GetType().FullName;

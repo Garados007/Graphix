@@ -1,25 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes
+﻿namespace Graphix.Prototypes
 {
+    /// <summary>
+    /// The basic prototype that can positioned on the screen
+    /// </summary>
     public class DisplayBase : PrototypeBase
     {
+        /// <summary>
+        /// The x position of this object
+        /// </summary>
         public ValueWrapper<ScreenPos> X { get; private set; }
 
+        /// <summary>
+        /// The y position of this object
+        /// </summary>
         public ValueWrapper<ScreenPos> Y { get; private set; }
 
+        /// <summary>
+        /// The width of this object
+        /// </summary>
         public ValueWrapper<ScreenPos> Width { get; private set; }
 
+        /// <summary>
+        /// The height of this object
+        /// </summary>
         public ValueWrapper<ScreenPos> Height { get; private set; }
 
+        /// <summary>
+        /// Defines if a object is visible or not
+        /// </summary>
         public ValueWrapper<bool> Visible { get; private set; }
 
+        /// <summary>
+        /// Defines if this object is solid for mouse events
+        /// </summary>
         public ValueWrapper<bool> MouseSolid { get; private set; }
 
+        /// <summary>
+        /// Creates the basic prototype that can positioned on the screen
+        /// </summary>
         public DisplayBase()
         {
             RenderName = GetType().FullName;

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 using Graphix.Prototypes;
@@ -13,13 +11,23 @@ using KnownColor = System.Drawing.KnownColor;
 
 namespace Graphix
 {
+    /// <summary>
+    /// Loader for the ui from the ui XML definition
+    /// </summary>
     public class PrototypeLoader
     {
         #region Static Lib
 
         static List<Type> dotnetPrototypes = new List<Type>();
+        /// <summary>
+        /// List of all core Prototypes
+        /// </summary>
         public static Type[] DotNetPrototypes => dotnetPrototypes.ToArray();
 
+        /// <summary>
+        /// Register a new core <see cref="PrototypeBase"/>
+        /// </summary>
+        /// <typeparam name="T">the type of the prototype</typeparam>
         public static void AddDotNetPrototype<T>() where T:PrototypeBase
         {
             var type = typeof(T);
@@ -32,6 +40,12 @@ namespace Graphix
         public static Dictionary<string, Type> ParameterTypes => parameterTypes.ToDictionary((e) => e.Key, (e) => e.Value);
         static Dictionary<string, Type> mathParameterTypes = new Dictionary<string, Type>();
 
+        /// <summary>
+        /// Register a parameter type that can used as the type of any value in the ui XML definition
+        /// </summary>
+        /// <typeparam name="T">the type of parameter</typeparam>
+        /// <param name="name">name of this type using in the XML definition</param>
+        /// <param name="converter">converter that can convert string to value type</param>
         public static void AddParameterType<T>(string name, Func<PrototypeLoader, PrototypeBase, string, T> converter) 
         {
             if (!parameterTypes.ContainsKey(name))
@@ -42,10 +56,18 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Public system values that can references everywhere in the ui
+        /// </summary>
         public static Dictionary<string, IValueWrapper> SystemValues { get; private set; }
 
         private static Dictionary<string, Tuple<Type, Delegate>> activators = new Dictionary<string, Tuple<Type, Delegate>>();
-
+        /// <summary>
+        /// Register a <see cref="AnimationActivation"/> to use in ui XML definition
+        /// </summary>
+        /// <typeparam name="T">the type of the activator</typeparam>
+        /// <param name="name">the name of this activator that can be used in ui XML definition</param>
+        /// <param name="dataFiller">method that can fill this activator with data from the node</param>
         public static void AddActivator<T>(string name, Action<PrototypeLoader, PrototypeBase, T, XmlNode> dataFiller) where T:AnimationActivation
         {
             if (!activators.ContainsKey(name))
@@ -53,13 +75,21 @@ namespace Graphix
         }
 
         private static Dictionary<string, Tuple<Type, Delegate>> effects = new Dictionary<string, Tuple<Type, Delegate>>();
-
+        /// <summary>
+        /// Register a <see cref="AnimationEffect"/> to use in ui XML definition
+        /// </summary>
+        /// <typeparam name="T">the type of the effect</typeparam>
+        /// <param name="name">the name of this effect that can be used in ui XML definition</param>
+        /// <param name="dataFiller">method that can fill this effect with data from the node</param>
         public static void AddEffect<T>(string name, Action<PrototypeLoader, PrototypeBase, T, XmlNode> dataFiller) where T:AnimationEffect
         {
             if (!effects.ContainsKey(name))
                 effects.Add(name, new Tuple<Type, Delegate>(typeof(T), dataFiller));
         }
 
+        /// <summary>
+        /// Initialize static values
+        /// </summary>
         static PrototypeLoader()
         {
             #region SystemValues
@@ -268,18 +298,33 @@ namespace Graphix
 
         #region Data Container
 
+        /// <summary>
+        /// All loaded Prototypes
+        /// </summary>
         public Dictionary<string, PrototypeBase> Prototypes { get; private set; }
 
+        /// <summary>
+        /// All loaded global objects
+        /// </summary>
         public Dictionary<string, PrototypeBase> Objects { get; private set; }
 
+        /// <summary>
+        /// All loaded status
+        /// </summary>
         public Dictionary<string, Status> Status { get; private set; }
 
+        /// <summary>
+        /// All loaded file names
+        /// </summary>
         public List<string> LoadedFiles { get; private set; }
 
         #endregion
 
         #region Public Stuff
 
+        /// <summary>
+        /// Create a Loader for the ui
+        /// </summary>
         public PrototypeLoader()
         {
             Prototypes = new Dictionary<string, PrototypeBase>();
@@ -289,6 +334,11 @@ namespace Graphix
             Prototypes.Add("PrototypeBase", new PrototypeBase());
         }
 
+        /// <summary>
+        /// Find a loaded status from its root key
+        /// </summary>
+        /// <param name="parts">keys to status</param>
+        /// <returns>found status</returns>
         public Status FindStatus(string[] parts)
         {
             if (parts.Length == 0) return null;
@@ -299,6 +349,16 @@ namespace Graphix
             return null;
         }
 
+        /// <summary>
+        /// Filter the loaded Data of this <see cref="PrototypeLoader"/>
+        /// </summary>
+        /// <param name="whitelistPrototypes">enabled Prototypes (if defined every need to be here)</param>
+        /// <param name="whitelistObjects">enabled Objects (if defined every need to be here)</param>
+        /// <param name="whitelistStatus">enabled Status (if defined every need to be here)</param>
+        /// <param name="blacklistPrototypes">disabled prototypes (only if no whitelist)</param>
+        /// <param name="blacklistObjects">disabled objects (only if no whitelist)</param>
+        /// <param name="blacklistStatus">disabled status (only if no whitelist)</param>
+        /// <returns>the new <see cref="PrototypeLoader"/> with the filtered data</returns>
         public PrototypeLoader Filter(string[] whitelistPrototypes, string[] whitelistObjects, string[] whitelistStatus,
             string[] blacklistPrototypes, string[] blacklistObjects, string[] blacklistStatus)
         {
@@ -322,6 +382,11 @@ namespace Graphix
             return pl;
         }
 
+        /// <summary>
+        /// Include the loaded Data from another <see cref="PrototypeLoader"/>
+        /// </summary>
+        /// <param name="other">the other loader with data</param>
+        /// <param name="overwriteData">overwrite existing data (otherwise keep old data)</param>
         public void Include(PrototypeLoader other, bool overwriteData = false)
         {
             foreach (var p in other.Prototypes)
@@ -355,6 +420,11 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Search for the real path of the references file name
+        /// </summary>
+        /// <param name="name">reference file name</param>
+        /// <returns>real path</returns>
         private string GetLibPath(string name)
         {
             var paths = new string[]
@@ -381,6 +451,10 @@ namespace Graphix
         Dictionary<string, IValueWrapper> idList = new Dictionary<string, IValueWrapper>();
         Dictionary<string, AnimationGroup> groupList = new Dictionary<string, AnimationGroup>();
 
+        /// <summary>
+        /// Load the data from a specific ui XML file
+        /// </summary>
+        /// <param name="file">the real file name (absolute or relative)</param>
         public void Load(string file)
         {
             file = new FileInfo(file).FullName;
@@ -415,7 +489,10 @@ namespace Graphix
         #endregion
 
         #region Private Methods
-
+        /// <summary>
+        /// remove comments from the XML tree
+        /// </summary>
+        /// <param name="node"></param>
         void ClearComments(XmlNode node)
         {
             foreach (XmlNode sub in node)
@@ -426,6 +503,10 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load all imports from an import section
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManageImports(XmlNode node)
         {
             foreach (XmlNode entry in node.ChildNodes)
@@ -481,6 +562,10 @@ namespace Graphix
             }
         }
         
+        /// <summary>
+        /// Load all status from an status section
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManageStatus(XmlNode node)
         {
             Status Parent = null;
@@ -500,6 +585,10 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load prototype imports
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManagePrototypeImport(XmlNode node)
         {
             var typename = node.Attributes["dotnet"].Value;
@@ -517,6 +606,10 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load prototype declaration
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManagePrototypeDeclaration(XmlNode node)
         {
             PrototypeBase prot;
@@ -539,6 +632,10 @@ namespace Graphix
             else Prototypes.Add(objName, prot);
         }
 
+        /// <summary>
+        /// Load prototype extension
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManagePrototypeExtension(XmlNode node)
         {
             var name = node.Attributes["extends"].Value;
@@ -559,6 +656,10 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load animations
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManageAnimation(XmlNode node)
         {
             var name = node.Attributes["targetname"].Value.Split('|');
@@ -626,6 +727,10 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load object creations
+        /// </summary>
+        /// <param name="node">XML node</param>
         void ManageObjectCreation(XmlNode node)
         {
             if (!Prototypes.ContainsKey(node.Name)) throw new KeyNotFoundException("Protoype '" + node.Name + "' doesn't exists");
@@ -642,6 +747,11 @@ namespace Graphix
             else Objects.Add(name, prot);
         }
 
+        /// <summary>
+        /// load parameter values
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="prot">current prototype</param>
         void SetupParameter(XmlNode node, PrototypeBase prot)
         {
             if (node["Parameter"] != null)
@@ -671,6 +781,11 @@ namespace Graphix
                 }
         }
 
+        /// <summary>
+        /// Load children prototypes of prototype
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="prot">current prototype</param>
         void SetupContainer(XmlNode node, PrototypeBase prot)
         {
             if (node["Container"] != null)
@@ -678,6 +793,11 @@ namespace Graphix
                     prot.Container.Add(CreateInstace(param, prot));
         }
 
+        /// <summary>
+        /// set values of prototype
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="prot">current Prototype</param>
         void SetupValues(XmlNode node, PrototypeBase prot)
         {
             if (node["ParameterSet"] != null)
@@ -694,6 +814,11 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Set the Values direct
+        /// </summary>
+        /// <param name="param">XML node</param>
+        /// <param name="prot">current Prototype</param>
         void SetupValueDirect(XmlNode param, PrototypeBase prot)
         {
             var p = prot.GetParameter(param.Name);
@@ -708,6 +833,11 @@ namespace Graphix
             else SetParameter(param.InnerText, p, prot.Parent);
         }
 
+        /// <summary>
+        /// Load animation for prototype
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="prot">current Prototype</param>
         void SetupAnimation(XmlNode node, PrototypeBase prot)
         {
             if (node["Animation"] != null)
@@ -733,6 +863,12 @@ namespace Graphix
                 }
         }
 
+        /// <summary>
+        /// Load activation
+        /// </summary>
+        /// <param name="node">XML Node</param>
+        /// <param name="prot">current Prototype</param>
+        /// <returns></returns>
         AnimationActivation GetActivation(XmlNode node, PrototypeBase prot)
         {
             if (!activators.ContainsKey(node.Name)) throw new KeyNotFoundException("Activation '" + node.Name + "' is not registered");
@@ -742,6 +878,12 @@ namespace Graphix
             return a;
         }
 
+        /// <summary>
+        /// Load effect
+        /// </summary>
+        /// <param name="node">XML Node</param>
+        /// <param name="prot">current Prototype</param>
+        /// <returns></returns>
         AnimationEffect GetEffect(XmlNode node, PrototypeBase prot)
         {
             if (!effects.ContainsKey(node.Name)) throw new KeyNotFoundException("Effect '" + node.Name + "' is not registered");
@@ -751,6 +893,12 @@ namespace Graphix
             return e;
         }
 
+        /// <summary>
+        /// Create a child Prototype from its parent prototype and setup values
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="parent">Parent Prototype</param>
+        /// <returns></returns>
         PrototypeBase CreateInstace(XmlNode node, PrototypeBase parent)
         {
             if (!Prototypes.ContainsKey(node.Name)) throw new KeyNotFoundException("Prototype '" + node.Name + "' doesn't exists");
@@ -767,6 +915,14 @@ namespace Graphix
             return prot;
         }
 
+        /// <summary>
+        /// Load the single value of the parameter
+        /// </summary>
+        /// <param name="value">value text</param>
+        /// <param name="target">target value container</param>
+        /// <param name="current">current Prototype</param>
+        /// <param name="forceref">force to have a reference</param>
+        /// <param name="customConverter">convert the string to its value</param>
         void SetParameter(string value, IValueWrapper target, PrototypeBase current, bool forceref = false, Delegate customConverter = null)
         {
             if (value == null)
@@ -808,6 +964,12 @@ namespace Graphix
             }
         }
 
+        /// <summary>
+        /// Load a math value context
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="parent">current Prototype</param>
+        /// <returns>value container</returns>
         IValueWrapper CreateMathValue(XmlNode node, PrototypeBase parent)
         {
             var type = mathParameterTypes[node.Attributes["type"].Value];
@@ -819,6 +981,12 @@ namespace Graphix
             return math;
         }
 
+        /// <summary>
+        /// Load Functions of Math context
+        /// </summary>
+        /// <param name="node">XML node</param>
+        /// <param name="parent">current Prototype</param>
+        /// <returns>value container</returns>
         IValueWrapper GenerateSubMathValue(XmlNode node, PrototypeBase parent)
         {
             if (node.Name == "Calc")

@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes
+﻿namespace Graphix.Prototypes
 {
+    /// <summary>
+    /// Prototype for an image
+    /// </summary>
     public class Image : DisplayBase
     {
+        /// <summary>
+        /// the url for the image file
+        /// </summary>
         public ValueWrapper<string> Url { get; private set; }
 
+        /// <summary>
+        /// Creates a Prototype for an image
+        /// </summary>
         public Image()
         {
             RenderName = GetType().FullName;

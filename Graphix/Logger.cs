@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace Graphix
 {
+    /// <summary>
+    /// Logs all messages of the core to the logfile
+    /// </summary>
     public static class Logger
     {
         static string nl = Environment.NewLine;
 
+        /// <summary>
+        /// log a single line of text to the log file
+        /// </summary>
+        /// <param name="text">text to log</param>
         public static void Log(string text)
         {
             var frame = new System.Diagnostics.StackTrace().GetFrame(1);
@@ -20,6 +23,10 @@ namespace Graphix
                 frame.GetFileName(), frame.GetFileLineNumber(), frame.GetFileColumnNumber()));
         }
 
+        /// <summary>
+        /// log an exception to the log file
+        /// </summary>
+        /// <param name="e">the exception object</param>
         public static void Error(Exception e)
         {
             var trace = e.StackTrace.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -28,6 +35,10 @@ namespace Graphix
                 string.Join(nl+"\t\t", e.StackTrace.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)), nl));
         }
 
+        /// <summary>
+        /// write a string to the log file
+        /// </summary>
+        /// <param name="text">text to write</param>
         static void write(string text)
         {
             File.AppendAllText("log.txt", text + nl);

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Graphix.Physic
 {
+    /// <summary>
+    /// Performs all Animations
+    /// </summary>
     public class AnimationRuntime
     {
+        /// <summary>
+        /// Information about a single running animation
+        /// </summary>
         class RunningAnimation
         {
             public AnimationGroup Group;
@@ -19,6 +23,9 @@ namespace Graphix.Physic
             public int SyncIndex = -1;
         }
 
+        /// <summary>
+        /// Information about the status
+        /// </summary>
         class StatusPushInfo
         {
             public Status Status;
@@ -26,14 +33,31 @@ namespace Graphix.Physic
             public int? Started;
         }
 
+        /// <summary>
+        /// Status has been changed
+        /// </summary>
+        /// <param name="oldStatus">old Status</param>
+        /// <param name="newStatus">new Status</param>
         public delegate void StatusChangedHandler(Status oldStatus, Status newStatus);
 
+        /// <summary>
+        /// List of all registered animations
+        /// </summary>
         List<AnimationGroup> Animations = new List<AnimationGroup>();
+        /// <summary>
+        /// List of all current execution animations
+        /// </summary>
         List<RunningAnimation> Running = new List<RunningAnimation>();
 
+        /// <summary>
+        /// The current implementation of the sound player
+        /// </summary>
         public ISoundPlayer SoundPlayer { get; set; }
 
         Status currentStatus = null;
+        /// <summary>
+        /// Change the current Status of the ui
+        /// </summary>
         public Status CurrentStatus
         {
             get => currentStatus;
@@ -56,10 +80,21 @@ namespace Graphix.Physic
             }
         }
 
+        /// <summary>
+        /// This event is called, when the ui status was changed
+        /// </summary>
         public event StatusChangedHandler StatusChanged;
 
+        /// <summary>
+        /// The queue for pushed status'
+        /// </summary>
         Queue<StatusPushInfo> StatusQueue = new Queue<StatusPushInfo>();
 
+        /// <summary>
+        /// Perform a change to a specific Status after some time
+        /// </summary>
+        /// <param name="status">the target status</param>
+        /// <param name="delay">time to wait in ms after this status take place</param>
         public void PushStatus(Status status, int delay)
         {
             StatusQueue.Enqueue(new StatusPushInfo()
@@ -70,6 +105,10 @@ namespace Graphix.Physic
             });
         }
 
+        /// <summary>
+        /// Perform all changes of the <see cref="CurrentStatus"/> 
+        /// that was previosly registred with <see cref="PushStatus(Status, int)"/>
+        /// </summary>
         public void FlushStatusQueue()
         {
             while (StatusQueue.Count > 0)
@@ -79,11 +118,19 @@ namespace Graphix.Physic
             }
         }
 
+        /// <summary>
+        /// Clear the queue of all changes of <see cref="CurrentStatus"/> that was
+        /// registred with <see cref="PushStatus(Status, int)"/>. No changement
+        /// will ocour
+        /// </summary>
         public void ClearStatusQueue()
         {
             StatusQueue.Clear();
         }
 
+        /// <summary>
+        /// Check the <see cref="StatusQueue"/> for new status
+        /// </summary>
         void PerformStatus()
         {
             if (StatusQueue.Count == 0) return;
@@ -105,6 +152,10 @@ namespace Graphix.Physic
             while (StatusQueue.Count != 0 && first == null);
         }
 
+        /// <summary>
+        /// Register an animation
+        /// </summary>
+        /// <param name="animation">the animation to register</param>
         public void Register(AnimationGroup animation)
         {
             if (!Animations.Contains(animation))
@@ -119,6 +170,10 @@ namespace Graphix.Physic
             }
         }
 
+        /// <summary>
+        /// Clear a registration of an animation
+        /// </summary>
+        /// <param name="animation">the animation to unregister</param>
         public void UnRegister(AnimationGroup animation)
         {
             Animations.Remove(animation);
@@ -130,6 +185,11 @@ namespace Graphix.Physic
                 }
         }
 
+        /// <summary>
+        /// Start a specified animation and add it to the running list
+        /// </summary>
+        /// <param name="animation">The Animation to start</param>
+        /// <param name="timing">the timing multipler</param>
         public void ExecuteAnimation(AnimationGroup animation, double timing = 1)
         {
             if (timing <= 0) timing = 1;
@@ -153,6 +213,10 @@ namespace Graphix.Physic
             Running.Add(running);
         }
 
+        /// <summary>
+        /// Execute a single running animation
+        /// </summary>
+        /// <param name="animation">the running animation</param>
         void PerformAnimation(RunningAnimation animation)
         {
             var timing = animation.Timing * animation.Group.EffectTiming.Value;
@@ -202,6 +266,9 @@ namespace Graphix.Physic
         }
 
         int timer = 40;
+        /// <summary>
+        /// The intervall in ms after each animation cycle is calculated (default: 40)
+        /// </summary>
         public int AnimationTimer
         {
             get => timer;
@@ -213,6 +280,9 @@ namespace Graphix.Physic
 
 
         bool enableTimer = false;
+        /// <summary>
+        /// Start the animation runtime
+        /// </summary>
         public void StartTimer()
         {
             enableTimer = true;
@@ -221,11 +291,17 @@ namespace Graphix.Physic
             thread.Start();
         }
 
+        /// <summary>
+        /// Stops the animation runtime
+        /// </summary>
         public void StopTimer()
         {
             enableTimer = false;
         }
 
+        /// <summary>
+        /// calculation loop
+        /// </summary>
         void timerLoop()
         {
             while (enableTimer)

@@ -1,24 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Graphix.Prototypes.Math
+﻿namespace Graphix.Prototypes.Math
 {
+    /// <summary>
+    /// A boolean value thats result is the result of a comparison
+    /// </summary>
     public class Check : IValueWrapper
     { 
+        /// <summary>
+        /// The Value of this comparison
+        /// </summary>
         public object Value { get => bufcalc(); set { } }
+        /// <summary>
+        /// unused
+        /// </summary>
         public IValueWrapper RemoteSource { get => null; set { } }
+        /// <summary>
+        /// The name of this value (should be "Check")
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Determines if the result of this value exists
+        /// </summary>
         public bool Exists { get; set; }
-
+        /// <summary>
+        /// If Precompile is on then this value is calculated only once.
+        /// If Precompile is off then this value is calculated each time.
+        /// </summary>
         public bool Precompile { get; set; }
-        
+        /// <summary>
+        /// The first value of this comparison
+        /// </summary>
         public IValueWrapper Value1 { get; set; }
-
+        /// <summary>
+        /// The second value of this comparison
+        /// </summary>
         public IValueWrapper Value2 { get; set; }
-
+        /// <summary>
+        /// The comparison mode
+        /// </summary>
         public CheckMode Mode { get; set; }
 
         object buffer; bool hasbuffer = false;
@@ -33,6 +51,10 @@ namespace Graphix.Prototypes.Math
             else return calc();
         }
 
+        /// <summary>
+        /// Calculate the value
+        /// </summary>
+        /// <returns>the result of this comparison</returns>
         private object calc()
         {
             var v1 = Value1.Value;
@@ -91,6 +113,10 @@ namespace Graphix.Prototypes.Math
             }
         }
 
+        /// <summary>
+        /// Clone this value completely
+        /// </summary>
+        /// <returns>the cloned result</returns>
         public IValueWrapper Clone()
         {
             var check = new Check();
@@ -103,6 +129,10 @@ namespace Graphix.Prototypes.Math
             return check;
         }
 
+        /// <summary>
+        /// Move the targets of its values using the helper
+        /// </summary>
+        /// <param name="helper">The flattened helper</param>
         public void MoveTargets(PrototypeFlattenerHelper helper)
         {
             if (Value1 != null)
@@ -120,13 +150,34 @@ namespace Graphix.Prototypes.Math
         }
     }
 
+    /// <summary>
+    /// The comparison mode of <see cref="Check"/>
+    /// </summary>
     public enum CheckMode
     {
+        /// <summary>
+        /// ==
+        /// </summary>
         eq,
+        /// <summary>
+        /// !=
+        /// </summary>
         neq,
+        /// <summary>
+        /// &lt;
+        /// </summary>
         lt,
+        /// <summary>
+        /// &lt;=
+        /// </summary>
         lteq,
+        /// <summary>
+        /// &gt;
+        /// </summary>
         gt,
+        /// <summary>
+        /// &gt;=
+        /// </summary>
         gteq
     }
 }
