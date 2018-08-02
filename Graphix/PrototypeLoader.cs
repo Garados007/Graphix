@@ -857,7 +857,7 @@ namespace Graphix
                             var target = eff.Attributes["target"] == null ? prot : prot.GetElement(eff.Attributes["target"].Value);
                             anim.Effects.Add(GetEffect(eff, target));
                         }
-                        SetParameter(group["Effects"].Attributes["timing"].Value, anim.EffectTiming, prot, false, parameterConverter["Double"]);
+                        SetParameter(group["Effects"].Attributes["timing"]?.Value, anim.EffectTiming, prot, false, parameterConverter["Double"]);
                     }
                     else anim.EffectTiming.Value = 1.0;
                 }

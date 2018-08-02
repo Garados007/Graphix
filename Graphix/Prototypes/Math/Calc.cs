@@ -210,38 +210,38 @@ namespace Graphix.Prototypes.Math
                     {
                         case CalcMethod.and:
                             {
-                                bool val = (bool)ValueList[0].Value;
+                                bool val = true;
                                 for (int i = 0; i < ValueList.Count; ++i) val &= (bool)ValueList[i].Value;
                                 return val;
                             }
                         case CalcMethod.or:
                             {
-                                bool val = (bool)ValueList[0].Value;
+                                bool val = false;
                                 for (int i = 0; i < ValueList.Count; ++i) val |= (bool)ValueList[i].Value;
                                 return val;
                             }
                         case CalcMethod.xor:
                             {
                                 bool val = (bool)ValueList[0].Value;
-                                for (int i = 0; i < ValueList.Count; ++i) val ^= (bool)ValueList[i].Value;
+                                for (int i = 1; i < ValueList.Count; ++i) val ^= (bool)ValueList[i].Value;
                                 return val;
                             }
                         case CalcMethod.nand:
                             {
                                 bool val = (bool)ValueList[0].Value;
-                                for (int i = 0; i < ValueList.Count; ++i) val = !(val && (bool)ValueList[i].Value);
+                                for (int i = 1; i < ValueList.Count; ++i) val = !(val && (bool)ValueList[i].Value);
                                 return val;
                             }
                         case CalcMethod.nor:
                             {
                                 bool val = (bool)ValueList[0].Value;
-                                for (int i = 0; i < ValueList.Count; ++i) val = !(val || (bool)ValueList[i].Value);
+                                for (int i = 1; i < ValueList.Count; ++i) val = !(val || (bool)ValueList[i].Value);
                                 return val;
                             }
                         case CalcMethod.xnor:
                             {
                                 bool val = (bool)ValueList[0].Value;
-                                for (int i = 0; i < ValueList.Count; ++i) val = !(val ^ (bool)ValueList[i].Value);
+                                for (int i = 1; i < ValueList.Count; ++i) val = !(val ^ (bool)ValueList[i].Value);
                                 return val;
                             }
                         case CalcMethod.not:
