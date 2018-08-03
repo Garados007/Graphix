@@ -429,9 +429,18 @@ namespace Graphix.Physic
         protected override void Animate(double time)
         {
             double finish;
-            if (ValueFinish.Exists) finish = ValueFinish.Value;
-            else if (ValueChange.Exists) finish = startValue + ValueChange.Value;
-            else finish = startValue;
+            if (Reverse)
+            {
+                if (ValueStart.Exists) finish = ValueStart.Value;
+                else if (ValueChange.Exists) finish = startValue - ValueChange.Value;
+                else finish = startValue;
+            }
+            else
+            {
+                if (ValueFinish.Exists) finish = ValueFinish.Value;
+                else if (ValueChange.Exists) finish = startValue + ValueChange.Value;
+                else finish = startValue;
+            }
             Target.Value = startValue + (finish - startValue) * PerformMode(time, Mode);
         }
 
@@ -441,9 +450,20 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else if (ValueChange.Exists && ValueStart.Exists)
+                    startValue = ValueStart.Value + ValueChange.Value;
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 
@@ -560,9 +580,18 @@ namespace Graphix.Physic
         protected override void Animate(double time)
         {
             double finish;
-            if (ValueFinish.Exists) finish = ValueFinish.Value;
-            else if (ValueChange.Exists) finish = startValue + ValueChange.Value;
-            else finish = startValue;
+            if (Reverse)
+            {
+                if (ValueStart.Exists) finish = ValueStart.Value;
+                else if (ValueChange.Exists) finish = startValue - ValueChange.Value;
+                else finish = startValue;
+            }
+            else
+            {
+                if (ValueFinish.Exists) finish = ValueFinish.Value;
+                else if (ValueChange.Exists) finish = startValue + ValueChange.Value;
+                else finish = startValue;
+            }
             Target.Value = (int)(startValue + (finish - startValue) * PerformMode(time, Mode));
         }
 
@@ -572,9 +601,20 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else if (ValueChange.Exists && ValueStart.Exists)
+                    startValue = ValueStart.Value + ValueChange.Value;
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 
@@ -682,8 +722,16 @@ namespace Graphix.Physic
         protected override void Animate(double time)
         {
             Color finish;
-            if (ValueFinish.Exists) finish = ValueFinish.Value;
-            else finish = startValue;
+            if (Reverse)
+            {
+                if (ValueStart.Exists) finish = ValueStart.Value;
+                else finish = startValue;
+            }
+            else
+            {
+                if (ValueFinish.Exists) finish = ValueFinish.Value;
+                else finish = startValue;
+            }
             var t = PerformMode(time, Mode);
             Target.Value = Color.FromArgb(
                 (int)Math.Max(0, Math.Min(255, startValue.A + (finish.A - startValue.A) * t)),
@@ -699,9 +747,18 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 
@@ -818,14 +875,28 @@ namespace Graphix.Physic
         protected override void Animate(double time)
         {
             ScreenPos finish;
-            if (ValueFinish.Exists) finish = ValueFinish.Value;
-            else if (ValueChange.Exists)
+            if (Reverse)
             {
-                if (startValue.PosType == ValueChange.Value.PosType)
-                    finish = new ScreenPos(startValue.Value + ValueChange.Value.Value, startValue.PosType);
+                if (ValueStart.Exists) finish = ValueStart.Value;
+                else if (ValueChange.Exists)
+                {
+                    if (startValue.PosType == ValueChange.Value.PosType)
+                        finish = new ScreenPos(startValue.Value - ValueChange.Value.Value, startValue.PosType);
+                    else finish = startValue;
+                }
                 else finish = startValue;
             }
-            else finish = startValue;
+            else
+            {
+                if (ValueFinish.Exists) finish = ValueFinish.Value;
+                else if (ValueChange.Exists)
+                {
+                    if (startValue.PosType == ValueChange.Value.PosType)
+                        finish = new ScreenPos(startValue.Value + ValueChange.Value.Value, startValue.PosType);
+                    else finish = startValue;
+                }
+                else finish = startValue;
+            }
             if (finish.PosType != startValue.PosType)
                 Target.Value = finish;
             else Target.Value = new ScreenPos(startValue.Value + (finish.Value - startValue.Value) * PerformMode(time, Mode), startValue.PosType);
@@ -837,9 +908,24 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else if (ValueChange.Exists && ValueStart.Exists)
+                {
+                    if (ValueStart.Value.PosType == ValueChange.Value.PosType)
+                        startValue = new ScreenPos(ValueStart.Value.Value + ValueChange.Value.Value, ValueChange.Value.PosType);
+                    else startValue = ValueStart.Value;
+                }
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 
@@ -944,7 +1030,9 @@ namespace Graphix.Physic
         /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
-            var finish = ValueFinish.Exists ? ValueFinish.Value : startValue;
+            var finish = Reverse ?
+                ValueStart.Exists ? ValueStart.Value : startValue :
+                ValueFinish.Exists ? ValueFinish.Value : startValue;
             Target.Value = PerformMode(time, Mode) >= 0.5 ? finish : startValue;
         }
 
@@ -955,9 +1043,18 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 
@@ -1072,7 +1169,9 @@ namespace Graphix.Physic
         /// <param name="time">the current progress (between 0 and 1)</param>
         protected override void Animate(double time)
         {
-            var finish = ValueFinish.Exists ? ValueFinish.Value : startValue;
+            var finish = Reverse ?
+                ValueStart.Exists ? ValueStart.Value : startValue :
+                ValueFinish.Exists ? ValueFinish.Value : startValue;
             time = PerformMode(time, Mode);
             if (time >= 1) Target.Value = finish;
             else if (time <= 0) Target.Value = startValue;
@@ -1100,9 +1199,18 @@ namespace Graphix.Physic
         /// <param name="runtime">current animation runtime</param>
         protected override void StartAnimate(AnimationRuntime runtime)
         {
-            if (ValueStart.Exists)
-                startValue = ValueStart.Value;
-            else startValue = Target.Value;
+            if (Reverse)
+            {
+                if (ValueFinish.Exists)
+                    startValue = ValueFinish.Value;
+                else startValue = Target.Value;
+            }
+            else
+            {
+                if (ValueStart.Exists)
+                    startValue = ValueStart.Value;
+                else startValue = Target.Value;
+            }
         }
     }
 

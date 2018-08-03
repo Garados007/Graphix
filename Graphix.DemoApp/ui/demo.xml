@@ -26,22 +26,15 @@
     <TextSize value="100" />
     <!--setup Animations for this button-->
     <Animation>
-      <!--Move Button to the right-->
-      <Group name="button-right">
+      <!--Move Button-->
+      <Group name="move-button">
         <Activation>
           <StatusChange new="Main" />
         </Activation>
-        <Effects timing="1">
-          <AScreenPos param="X" value-change="30%w" time-duration="5" mode="Swing" />
-        </Effects>
-      </Group>
-      <!--Move button to the left-->
-      <Group name="button-left">
-        <Activation>
-        </Activation>
-        <Effects timing="1">
-          <AScreenPos param="X" value-change="-30%w" time-duration="5" mode="Swing" />
-          <Call effect="button-right" timing="1" time-start="5" asnyc="true" />
+        <Effects>
+          <AScreenPos param="X" value-change="30%w" time-duration="5" mode="Swing" reverse="@movemod" />
+          <ABool param="movemod" value-finish="@inv-movemod" />
+          <Call effect="move-button" time-start="5" async="true" />
         </Effects>
       </Group>
       <!--change color on click-->
@@ -67,22 +60,21 @@
     </Animation>
     <!--Define new parameters-->
     <Parameter>
-      <!--these parameters are used in the animation-->
+      <!--these parameters are used to animate the color-->
       <Bool name="clickmod" value="true" />
       <Math name="inv-clickmod" type="Bool">
         <Calc method="not" type="Bool">
           <Bool ref="@clickmod" />
         </Calc>
       </Math>
+      <!--these parameters are used to animate the box position-->
+      <Bool name="movemod" value="false" />
+      <Math name="inv-movemod" type="Bool">
+        <Calc method="not" type="Bool">
+          <Bool ref="@movemod" />
+        </Calc>
+      </Math>
     </Parameter>
   </Button>
-  
-  <!--its possible to add an animation to an existing block-->
-  <Animation target="object" targetname="demobutton">
-    <Group extend="button-right" extendtype="append">
-      <Effects>
-        <Call effect="button-left" timing="1" time-start="5" async="true" />
-      </Effects>
-    </Group>
-  </Animation>
+
 </Objects>
