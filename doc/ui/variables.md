@@ -171,6 +171,22 @@ Four integer values between 0 and 255 seperated with a comma. First one is for r
 - `0,0,255,128` - Blue, half opacity
 - `0,0,0,0` - Black, full opacity. Full transparent
 
+
+### ClickButton
+
+```xml
+<ClickButton name="clickButton" value="Left" />
+```
+
+Define a button on the mouse.
+
+| button | Description |
+|-|-|
+| Left | Left button|
+| Middle | middle button (most scroll wheel) |
+| Right | Right button |
+| Unknown | Unknown button |
+
 ## Set Value
 
 They are many options to set a value of a variable.

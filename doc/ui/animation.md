@@ -78,12 +78,13 @@ The values can be reference values (more [here](variables.md)).
 ### Click
 
 ```xml
-<Click enable="true" />
+<Click enable="true" button="Left" />
 ```
 
 This animation whould start if the user click on this object.
 
 The optional attribute `enable` can turn this activator on or off.
+The optional attribute `button` define which button has to pressed to activate. If the attribute `button` is not set any button will work.
 
 The values can be reference values (more [here](variables.md)).
 

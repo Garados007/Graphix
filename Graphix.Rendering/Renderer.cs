@@ -131,7 +131,14 @@ namespace Graphix.Rendering
         {
             new Task(() =>
             {
-                ObjectRender.Click(this, new Vector2(e.X, e.Y), screenSize);
+                var button = ClickButton.Unknown;
+                switch (e.Button)
+                {
+                    case System.Windows.Forms.MouseButtons.Left: button = ClickButton.Left; break;
+                    case System.Windows.Forms.MouseButtons.Middle: button = ClickButton.Middle; break;
+                    case System.Windows.Forms.MouseButtons.Right: button = ClickButton.Right; break;
+                }
+                ObjectRender.Click(this, new Vector2(e.X, e.Y), screenSize, button);
             }).Start();
         }
 

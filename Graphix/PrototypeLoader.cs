@@ -169,6 +169,12 @@ namespace Graphix
                     return error ? Color.Black : Color.FromArgb(a, r, g, b);
                 }
             });
+            AddParameterType("ClickButton", (pl, pb, t) =>
+            {
+                if (Enum.TryParse(t, true, out ClickButton button))
+                    return button;
+                else return ClickButton.Left;
+            });
 
             #endregion
             #region Activator
@@ -193,6 +199,7 @@ namespace Graphix
             AddActivator<ClickAnimation>("Click", (pl, pb, a, node) =>
             {
                 pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
+                pl.SetParameter(node.Attributes["button"]?.Value, a.Button, pb, false, parameterConverter["ClickButton"]);
             });
 
             #endregion

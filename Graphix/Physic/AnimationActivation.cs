@@ -205,6 +205,19 @@ namespace Graphix.Physic
     public class ClickAnimation : AnimationActivation
     {
         /// <summary>
+        /// The button that was clicked
+        /// </summary>
+        public ValueWrapper<ClickButton> Button { get; set; }
+
+        /// <summary>
+        /// An activator that actives an animation after its block was clicked
+        /// </summary>
+        public ClickAnimation()
+        {
+            Button = new ValueWrapper<ClickButton>();
+        }
+
+        /// <summary>
         /// Converts this Activation in its XML representation
         /// </summary>
         /// <param name="xml">target xml document</param>
@@ -214,6 +227,7 @@ namespace Graphix.Physic
         {
             var node = xml.CreateElement("Click");
             AddParamToXml(xml, node, Enabled, "enable", dict);
+            AddParamToXml(xml, node, Button, "button", dict);
             return node;
         }
 
@@ -225,7 +239,7 @@ namespace Graphix.Physic
         {
             return new IValueWrapper[]
             {
-                Enabled
+                Enabled, Button
             };
         }
 
@@ -236,6 +250,7 @@ namespace Graphix.Physic
         public override void MoveTargets(PrototypeFlattenerHelper helper)
         {
             Enabled = helper.Convert(Enabled);
+            Button = helper.Convert(Button);
         }
 
         /// <summary>
@@ -246,7 +261,31 @@ namespace Graphix.Physic
         {
             var act = new ClickAnimation();
             act.Enabled = (ValueWrapper<bool>)Enabled.Clone();
+            act.Button = (ValueWrapper<ClickButton>)Button.Clone();
             return act;
         }
+    }
+
+    /// <summary>
+    /// Define the mouse button that was clicked
+    /// </summary>
+    public enum ClickButton
+    {
+        /// <summary>
+        /// The left mouse button was clicked
+        /// </summary>
+        Left,
+        /// <summary>
+        /// The right mouse button was clicked
+        /// </summary>
+        Right,
+        /// <summary>
+        /// The middle mouse button was clicked
+        /// </summary>
+        Middle,
+        /// <summary>
+        /// An unknown mouse button was clicked
+        /// </summary>
+        Unknown
     }
 }
