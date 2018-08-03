@@ -288,4 +288,205 @@ namespace Graphix.Physic
         /// </summary>
         Unknown
     }
+
+    /// <summary>
+    /// An activator that actives an animation after a button on the keyboard was clicked
+    /// </summary>
+    public class KeyDownActivation : AnimationActivation
+    {
+        /// <summary>
+        /// The button that was clicked
+        /// </summary>
+        public ValueWrapper<Keys> Key { get; set; }
+
+        /// <summary>
+        /// An activator that actives an animation after its block was clicked
+        /// </summary>
+        public KeyDownActivation()
+        {
+            Key = new ValueWrapper<Keys>();
+        }
+
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
+        public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
+        {
+            var node = xml.CreateElement("KeyDown");
+            AddParamToXml(xml, node, Enabled, "enable", dict);
+            AddParamToXml(xml, node, Key, "key", dict);
+            return node;
+        }
+
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
+        public override IValueWrapper[] GetValueWrapper()
+        {
+            return new IValueWrapper[]
+            {
+                Enabled, Key
+            };
+        }
+
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
+        public override void MoveTargets(PrototypeFlattenerHelper helper)
+        {
+            Enabled = helper.Convert(Enabled);
+            Key = helper.Convert(Key);
+        }
+
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
+        public override AnimationActivation Clone()
+        {
+            var act = new KeyDownActivation();
+            act.Enabled = (ValueWrapper<bool>)Enabled.Clone();
+            act.Key = (ValueWrapper<Keys>)Key.Clone();
+            return act;
+        }
+    }
+
+    /// <summary>
+    /// An activator that actives an animation after a button on the keyboard was released
+    /// </summary>
+    public class KeyUpActivation : AnimationActivation
+    {
+        /// <summary>
+        /// The button that was released
+        /// </summary>
+        public ValueWrapper<Keys> Key { get; set; }
+
+        /// <summary>
+        /// An activator that actives an animation after its block was released
+        /// </summary>
+        public KeyUpActivation()
+        {
+            Key = new ValueWrapper<Keys>();
+        }
+
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
+        public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
+        {
+            var node = xml.CreateElement("KeyUp");
+            AddParamToXml(xml, node, Enabled, "enable", dict);
+            AddParamToXml(xml, node, Key, "key", dict);
+            return node;
+        }
+
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
+        public override IValueWrapper[] GetValueWrapper()
+        {
+            return new IValueWrapper[]
+            {
+                Enabled, Key
+            };
+        }
+
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
+        public override void MoveTargets(PrototypeFlattenerHelper helper)
+        {
+            Enabled = helper.Convert(Enabled);
+            Key = helper.Convert(Key);
+        }
+
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
+        public override AnimationActivation Clone()
+        {
+            var act = new KeyUpActivation();
+            act.Enabled = (ValueWrapper<bool>)Enabled.Clone();
+            act.Key = (ValueWrapper<Keys>)Key.Clone();
+            return act;
+        }
+    }
+
+    /// <summary>
+    /// An activator that actives an animation after a char was typed on the keyboard
+    /// </summary>
+    public class KeyPressActivation : AnimationActivation
+    {
+        /// <summary>
+        /// The button that was clicked
+        /// </summary>
+        public ValueWrapper<string> Char { get; set; }
+
+        /// <summary>
+        /// An activator that actives an animation after a char was typed on the keyboard
+        /// </summary>
+        public KeyPressActivation()
+        {
+            Char = new ValueWrapper<string>();
+        }
+
+        /// <summary>
+        /// Converts this Activation in its XML representation
+        /// </summary>
+        /// <param name="xml">target xml document</param>
+        /// <param name="dict">the exporter dictionary for variable names</param>
+        /// <returns>the new XML node</returns>
+        public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
+        {
+            var node = xml.CreateElement("KeyPress");
+            AddParamToXml(xml, node, Enabled, "enable", dict);
+            AddParamToXml(xml, node, Char, "char", dict);
+            return node;
+        }
+
+        /// <summary>
+        /// A List of all used Variables
+        /// </summary>
+        /// <returns>the used variable list</returns>
+        public override IValueWrapper[] GetValueWrapper()
+        {
+            return new IValueWrapper[]
+            {
+                Enabled, Char
+            };
+        }
+
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
+        public override void MoveTargets(PrototypeFlattenerHelper helper)
+        {
+            Enabled = helper.Convert(Enabled);
+            Char = helper.Convert(Char);
+        }
+
+        /// <summary>
+        /// Clone this Activation completly
+        /// </summary>
+        /// <returns>the clone</returns>
+        public override AnimationActivation Clone()
+        {
+            var act = new KeyPressActivation();
+            act.Enabled = (ValueWrapper<bool>)Enabled.Clone();
+            act.Char = (ValueWrapper<string>)Char.Clone();
+            return act;
+        }
+    }
 }

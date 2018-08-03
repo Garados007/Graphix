@@ -88,6 +88,45 @@ The optional attribute `button` define which button has to pressed to activate. 
 
 The values can be reference values (more [here](variables.md)).
 
+### KeyDown
+
+```xml
+<KeyDown enable="true" key="Enter" />
+```
+
+This animation whould start if the user pressed a key on the keyboard.
+
+The optional attribute `enable` can turn this activator on or off.
+The optional attribute `key` define which key has to pressed to activate. If the attribute `key` is not set any key will work.
+
+The values can be reference values (more [here](variables.md)).
+
+### KeyUp
+
+```xml
+<KeyUp enable="true" key="Enter" />
+```
+
+This animation whould start if the user released a key on the keyboard.
+
+The optional attribute `enable` can turn this activator on or off.
+The optional attribute `key` define which key has to released to activate. If the attribute `key` is not set any key will work.
+
+The values can be reference values (more [here](variables.md)).
+
+### KeyPress
+
+```xml
+<KeyPress enable="true" char="f" />
+```
+
+This animation whould start if the user enter a single char on the keyboard.
+
+The optional attribute `enable` can turn this activator on or off.
+The optional attribute `key` define which character has to insert. If the attribute `key` is not set any character will work.
+
+The values can be reference values (more [here](variables.md)).
+
 ## Animation effects
 
 The animation effect to the real magic here. Each of them can manipulate variables or trigger some events.

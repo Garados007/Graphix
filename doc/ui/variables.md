@@ -187,6 +187,14 @@ Define a button on the mouse.
 | Right | Right button |
 | Unknown | Unknown button |
 
+### Key
+
+```xml
+<Key name="key" value="Escape" />
+```
+
+Define a button on the keyboard. For a full List of Values see [here](../../Graphix/Physic/Keys.cs).
+
 ## Set Value
 
 They are many options to set a value of a variable.

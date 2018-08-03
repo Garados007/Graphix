@@ -94,6 +94,8 @@ namespace Graphix.Rendering
             screenSize = new Size2(Form.Width, Form.Height);
             Form.MouseDown += Form_MouseDown;
             Form.KeyDown += Form_KeyDown;
+            Form.KeyUp += Form_KeyUp;
+            Form.KeyPress += Form_KeyPress;
 
             SharpRender = new SharpRender(Form);
             Logger.Log("Sharp Renderer created");
@@ -113,6 +115,37 @@ namespace Graphix.Rendering
             Logger.Log("Bounds setted");
         }
 
+        public event Action<Keys> KeyDown, KeyUp;
+        public event Action<char> KeyPress;
+
+        private void Form_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                KeyPress?.Invoke(e.KeyChar);
+                ObjectRender.KeyEvent(this, new KeyEvent
+                {
+                    KeyMode = KeyEvent.Mode.Press,
+                    Char = "" + e.KeyChar
+                });
+            });
+            e.Handled = true;
+        }
+
+        private void Form_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                KeyUp?.Invoke((Keys)e.KeyCode);
+                ObjectRender.KeyEvent(this, new KeyEvent
+                {
+                    KeyMode = KeyEvent.Mode.Up,
+                    Key = (Keys)e.KeyCode
+                });
+            });
+            e.Handled = true;
+        }
+
         public bool EnableSnapShot { get; set; }
         private void Form_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
@@ -125,7 +158,19 @@ namespace Graphix.Rendering
                     pe.Objects.Add(obj);
                 pe.SaveFlatDom("snapshot.xml");
             }
+            Task.Run(() =>
+            {
+                KeyDown?.Invoke((Keys)e.KeyCode);
+                ObjectRender.KeyEvent(this, new KeyEvent
+                {
+                    KeyMode = KeyEvent.Mode.Down,
+                    Key = (Keys)e.KeyCode
+                });
+            });
+            e.Handled = true;
         }
+
+        public event Action<Vector2, Size2, ClickButton> MouseDown;
 
         private void Form_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -138,6 +183,7 @@ namespace Graphix.Rendering
                     case System.Windows.Forms.MouseButtons.Middle: button = ClickButton.Middle; break;
                     case System.Windows.Forms.MouseButtons.Right: button = ClickButton.Right; break;
                 }
+                MouseDown?.Invoke(new Vector2(e.X, e.Y), screenSize, button);
                 ObjectRender.Click(this, new Vector2(e.X, e.Y), screenSize, button);
             }).Start();
         }

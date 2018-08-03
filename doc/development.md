@@ -171,6 +171,50 @@ The sound would loaded and played asynchron.
 renderer.Animation.SoundPlayer.PlaySound(@"path\to\file", 1);
 ```
 
+### Hook Mouse Down
+
+Get informed when the user click on the screen.
+
+```csharp
+renderer.MouseDown += (position, screenSize, button) =>
+    {
+        //your handler
+    };
+```
+
+### Hook Keyboard Key Down
+
+Get informed when the user click on the keyboard.
+
+```csharp
+renderer.KeyDown += (key) =>
+    {
+        //your handler
+    };
+```
+
+### Hook Keyboard Key Up
+
+Get informed when the user release a button on the keyboard.
+
+```csharp
+renderer.KeyUp += (key) =>
+    {
+        //your handler
+    };
+```
+
+### Hook Keyboard Key Press
+
+Get informed when the user enter a single character
+
+```csharp
+renderer.KeyPress += (character) =>
+    {
+        //your handler
+    };
+```
+
 ## Utilities
 
 ### Write to log file

@@ -175,6 +175,7 @@ namespace Graphix
                     return button;
                 else return ClickButton.Left;
             });
+            AddParameterType("Key", (pl, pb, t) => (Keys)Enum.Parse(typeof(Keys), t));
 
             #endregion
             #region Activator
@@ -200,6 +201,21 @@ namespace Graphix
             {
                 pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
                 pl.SetParameter(node.Attributes["button"]?.Value, a.Button, pb, false, parameterConverter["ClickButton"]);
+            });
+            AddActivator<KeyDownActivation>("KeyDown", (pl, pb, a, node) =>
+            {
+                pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
+                pl.SetParameter(node.Attributes["key"]?.Value, a.Key, pb, false, parameterConverter["Key"]);
+            });
+            AddActivator<KeyUpActivation>("KeyUp", (pl, pb, a, node) =>
+            {
+                pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
+                pl.SetParameter(node.Attributes["key"]?.Value, a.Key, pb, false, parameterConverter["Key"]);
+            });
+            AddActivator<KeyPressActivation>("KeyPress", (pl, pb, a, node) =>
+            {
+                pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
+                pl.SetParameter(node.Attributes["char"]?.Value, a.Char, pb, false, parameterConverter["Key"]);
             });
 
             #endregion

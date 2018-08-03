@@ -59,6 +59,7 @@
     <Compile Include="Physic\AnimationRuntime.cs" />
     <Compile Include="Physic\AnimationRuntimeData.cs" />
     <Compile Include="Physic\ISoundPlayer.cs" />
+    <Compile Include="Physic\Keys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PrototypeExporter.cs" />
     <Compile Include="PrototypeLoader.cs" />

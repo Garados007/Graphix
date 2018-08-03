@@ -49,6 +49,7 @@
       <Group name="click-activator">
         <Activation>
           <Click />
+          <KeyDown key="Space" />
         </Activation>
         <Effects timing="1">
           <ABool param="clickmod" value-finish="@inv-clickmod" />
