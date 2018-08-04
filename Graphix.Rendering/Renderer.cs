@@ -34,6 +34,13 @@ namespace Graphix.Rendering
             Animation = new AnimationRuntime();
             RessourceManager = new RessourceManager();
             Animation.SoundPlayer = new SoundPlayer();
+            Animation.OnClose += () =>
+            {
+                if (Form == null) return;
+                if (Form.InvokeRequired)
+                    Form.Invoke(new Action(Form.Close));
+                else Form.Close();
+            };
         }
 
         public Status GetStatus(string fullName)
@@ -158,6 +165,8 @@ namespace Graphix.Rendering
                     pe.Objects.Add(obj);
                 pe.SaveFlatDom("snapshot.xml");
             }
+            if (e.KeyCode == System.Windows.Forms.Keys.F4 && e.Alt)
+                Animation.DoClose(); //because we set e.Handled to true this event is normaly ignored
             Task.Run(() =>
             {
                 KeyDown?.Invoke((Keys)e.KeyCode);

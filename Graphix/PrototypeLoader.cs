@@ -313,6 +313,10 @@ namespace Graphix
                 pl.SetParameter(node.Attributes["file"]?.Value, e.File, pb, false, parameterConverter["String"]);
                 pl.SetParameter(node.Attributes["volume"]?.Value, e.Volume, pb, false, parameterConverter["Double"]);
             });
+            AddEffect<CloseEffect>("Close", (pl, pb, e, node) =>
+            {
+                effectBase(pl, pb, e, node);
+            });
 
             #endregion
         }

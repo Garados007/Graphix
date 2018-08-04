@@ -58,6 +58,15 @@
           <AColor param="BorderColor" time-duration="0.5" value-finish="yellow" />
         </Effects>
       </Group>
+      <!--close application-->
+      <Group name="close">
+        <Activation>
+          <KeyDown key="Escape" />
+        </Activation>
+        <Effects>
+          <Close />
+        </Effects>
+      </Group>
     </Animation>
     <!--Define new parameters-->
     <Parameter>

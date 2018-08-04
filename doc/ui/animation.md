@@ -306,6 +306,14 @@ Start a sound file (this effect will not wait until its finished). Its recommend
 | `file`  | true | `String` | The path to the sound file |
 | `volume` | false | `Double` | The volume modifier for the sound file |
 
+### Close
+
+```xml
+<Close />
+```
+
+Close the whole application.
+
 ## Extend Animation Groups
 
 If you extend a prototype (see [here](prototype.md)) with an animation a new animation group would be added.

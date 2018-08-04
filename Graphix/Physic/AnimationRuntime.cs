@@ -312,5 +312,18 @@ namespace Graphix.Physic
                 Thread.Sleep(timer);
             }
         }
+
+        /// <summary>
+        /// This event is called when some animation wants to close the application
+        /// </summary>
+        public event Action OnClose;
+
+        /// <summary>
+        /// Close application
+        /// </summary>
+        public void DoClose()
+        {
+            OnClose?.Invoke();
+        }
     }
 }

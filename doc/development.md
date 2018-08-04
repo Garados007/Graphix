@@ -105,6 +105,14 @@ You can change the animation clockspeed. The value is stores as an intervall in 
 renderer.Animation.AnimationTimer = 40;
 ```
 
+### Close the application
+
+You can call this method to close the application. After this a save shutdown would be initiated.
+
+```csharp
+renderer.Animation.DoClose();
+```
+
 ## More Interaction to the UI
 
 Most time you want better interaction between the logic and the ui.
@@ -210,6 +218,18 @@ Get informed when the user enter a single character
 
 ```csharp
 renderer.KeyPress += (character) =>
+    {
+        //your handler
+    };
+```
+
+### Hook Application close
+
+Get informed when someone (ui or direct call) want to close the application. Use this method to release you
+handles and save your data. Keep in mind that your call should be done after 2 seconds. Nobody like apps that run in background forever.
+
+```csharp
+renderer.Animation.OnClose += () =>
     {
         //your handler
     };
