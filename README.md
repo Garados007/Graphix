@@ -1,5 +1,5 @@
 # Graphix
-A very simple grafic engine for windows. It take use of DirectX over SharpDX, .NET Framework and MaxLib Library.
+A very simple grafic engine for windows. It take use of DirectX over SharpDX and the .NET Framework.
 
 ## Documentation
 
