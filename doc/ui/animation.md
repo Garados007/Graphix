@@ -127,6 +127,19 @@ The optional attribute `key` define which character has to insert. If the attrib
 
 The values can be reference values (more [here](variables.md)).
 
+### Channel
+
+```xml
+<Channel enable="true" old="loading-screen" />
+```
+
+This animation whould start if the channel is changed from the old one to the current one.
+
+The optional attribute `old` specifiy the old channel name, if omit any will work.
+
+The values can be reference values (more [here](variables.md)).
+
+
 ## Animation effects
 
 The animation effect to the real magic here. Each of them can manipulate variables or trigger some events.
@@ -313,6 +326,20 @@ Start a sound file (this effect will not wait until its finished). Its recommend
 ```
 
 Close the whole application.
+
+### Channel
+
+```xml
+<Channel name="game" />
+```
+
+Start the specified channel and remove the current one. This channel need to be registred before.
+
+**Attributes:**
+
+| attribute | required | value type | Description |
+|-|-|-|-|
+| `name`  | true | `String` | The name of the channel |
 
 ## Extend Animation Groups
 

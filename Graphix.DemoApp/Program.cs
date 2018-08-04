@@ -45,10 +45,12 @@ namespace Graphix.DemoApp
                     if (Debug)
                     {
                         renderer.ShowFps = true;
+                        renderer.VSync = false;
                     }
                     else
                     {
                         renderer.ShowFps = false;
+                        renderer.VSync = true;
                     }
 
                     //start the renderer and display main window

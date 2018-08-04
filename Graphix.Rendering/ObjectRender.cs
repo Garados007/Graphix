@@ -56,58 +56,6 @@ namespace Graphix.Rendering
             return force && found;
         }
 
-        public void KeyEvent(Renderer source, KeyEvent keyEvent)
-        {
-            foreach (var obj in source.Objects)
-                KeyEvent(source, obj, keyEvent);
-        }
-
-        void KeyEvent(Renderer source, FlatPrototype prot, KeyEvent keyEvent)
-        {
-            foreach (var anim in prot.Animations)
-                foreach (var act in anim.Activations)
-                {
-                    var found = false;
-                    if (act.Enabled)
-                        switch (keyEvent.KeyMode)
-                        {
-                            case Rendering.KeyEvent.Mode.Down:
-                                if (act is Physic.KeyDownActivation)
-                                {
-                                    var kact = act as Physic.KeyDownActivation;
-                                    if (kact.Key.Exists && kact.Key.Value != keyEvent.Key)
-                                        continue;
-                                    source.Animation.ExecuteAnimation(anim);
-                                    found = true;
-                                }
-                                break;
-                            case Rendering.KeyEvent.Mode.Up:
-                                if (act is Physic.KeyUpActivation)
-                                {
-                                    var kact = act as Physic.KeyUpActivation;
-                                    if (kact.Key.Exists && kact.Key.Value != keyEvent.Key)
-                                        continue;
-                                    source.Animation.ExecuteAnimation(anim);
-                                    found = true;
-                                }
-                                break;
-                            case Rendering.KeyEvent.Mode.Press:
-                                if (act is Physic.KeyPressActivation)
-                                {
-                                    var kact = act as Physic.KeyPressActivation;
-                                    if (kact.Char.Exists && kact.Char.Value != keyEvent.Char)
-                                        continue;
-                                    source.Animation.ExecuteAnimation(anim);
-                                    found = true;
-                                }
-                                break;
-                        }
-                    if (found) break;
-                }
-            foreach (var obj in prot.Container)
-                KeyEvent(source, obj, keyEvent);
-        }
-
         public void Render(Renderer source, Size2 screen)
         {
             foreach (var obj in source.Objects)

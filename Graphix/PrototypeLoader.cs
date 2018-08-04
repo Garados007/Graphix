@@ -217,6 +217,11 @@ namespace Graphix
                 pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
                 pl.SetParameter(node.Attributes["char"]?.Value, a.Char, pb, false, parameterConverter["Key"]);
             });
+            AddActivator<ChannelActivation>("Channel", (pl, pb, a, node) =>
+            {
+                pl.SetParameter(node.Attributes["enable"]?.Value, a.Enabled, pb, false, parameterConverter["Bool"]);
+                pl.SetParameter(node.Attributes["old"]?.Value, a.Old, pb, false, parameterConverter["String"]);
+            });
 
             #endregion
             #region Effect
@@ -316,6 +321,11 @@ namespace Graphix
             AddEffect<CloseEffect>("Close", (pl, pb, e, node) =>
             {
                 effectBase(pl, pb, e, node);
+            });
+            AddEffect<ChannelEffect>("Channel", (pl, pb, e, node) =>
+            {
+                effectBase(pl, pb, e, node);
+                pl.SetParameter(node.Attributes["name"]?.Value, e.Name, pb, false, parameterConverter["String"]);
             });
 
             #endregion

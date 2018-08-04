@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Graphix.Physic
 {
@@ -12,7 +13,7 @@ namespace Graphix.Physic
         /// <summary>
         /// Information about a single running animation
         /// </summary>
-        class RunningAnimation
+        internal class RunningAnimation
         {
             public AnimationGroup Group;
             public double StartTime, Timing;
@@ -33,6 +34,34 @@ namespace Graphix.Physic
             public int? Started;
         }
 
+        private DisplayChannel channel = new DisplayChannel();
+        /// <summary>
+        /// The current channel which define the current view.
+        /// </summary>
+        public DisplayChannel Channel
+        {
+            get => channel;
+            set
+            {
+                if (value == null) throw new ArgumentNullException();
+                if (channel.IsUsed && value == channel) return;
+                //hot swap magic
+                var old = channel;
+                value.Using = true;
+                channel = value;
+                old.Using = false;
+                Task.Run(() => RunActivator<ChannelActivation>((act) =>
+                    !act.Old.Exists || act.Old.Value == old.Name
+                ));
+            }
+        }
+
+        private List<DisplayChannel> channels = new List<DisplayChannel>();
+        /// <summary>
+        /// A list of all possible channels for <see cref="ChannelEffect"/>.
+        /// </summary>
+        public List<DisplayChannel> Channels => channels;
+
         /// <summary>
         /// Status has been changed
         /// </summary>
@@ -43,40 +72,32 @@ namespace Graphix.Physic
         /// <summary>
         /// List of all registered animations
         /// </summary>
-        List<AnimationGroup> Animations = new List<AnimationGroup>();
+        List<AnimationGroup> Animations => Channel.Animations;
         /// <summary>
         /// List of all current execution animations
         /// </summary>
-        List<RunningAnimation> Running = new List<RunningAnimation>();
+        List<RunningAnimation> Running => Channel.Running;
 
         /// <summary>
         /// The current implementation of the sound player
         /// </summary>
         public ISoundPlayer SoundPlayer { get; set; }
-
-        Status currentStatus = null;
+        
         /// <summary>
         /// Change the current Status of the ui
         /// </summary>
         public Status CurrentStatus
         {
-            get => currentStatus;
+            get => Channel.CurrentStatus;
             set
             {
-                if (currentStatus == value) return;
-                foreach (var animation in Animations)
-                    foreach (var anim in animation.Activations)
-                        if ((anim is StatusChange) && anim.Enabled)
-                        {
-                            var act = anim as StatusChange;
-                            if (Status.IsSubsetOrEqualFrom(act.New, value) && Status.IsSubsetOrEqualFrom(act.Old, currentStatus))
-                            {
-                                ExecuteAnimation(animation);
-                                break;
-                            }
-                        }
-                StatusChanged?.Invoke(currentStatus, value);
-                currentStatus = value;
+                if (Channel.CurrentStatus == value) return;
+                RunActivator<StatusChange>((act) =>
+                    Status.IsSubsetOrEqualFrom(act.New, value) && 
+                    Status.IsSubsetOrEqualFrom(act.Old, Channel.CurrentStatus)
+                );
+                StatusChanged?.Invoke(Channel.CurrentStatus, value);
+                Channel.CurrentStatus = value;
             }
         }
 
@@ -158,16 +179,7 @@ namespace Graphix.Physic
         /// <param name="animation">the animation to register</param>
         public void Register(AnimationGroup animation)
         {
-            if (!Animations.Contains(animation))
-            {
-                Animations.Add(animation);
-                foreach (var act in animation.Activations)
-                    if (act is AfterAnimation)
-                    {
-                        var anim = act as AfterAnimation;
-                        anim.Effect.HookedAnimations.Add(anim);
-                    }
-            }
+            Channel.Register(animation);
         }
 
         /// <summary>
@@ -176,13 +188,25 @@ namespace Graphix.Physic
         /// <param name="animation">the animation to unregister</param>
         public void UnRegister(AnimationGroup animation)
         {
-            Animations.Remove(animation);
-            foreach (var act in animation.Activations)
-                if (act is AfterAnimation)
-                {
-                    var anim = act as AfterAnimation;
-                    anim.Effect.HookedAnimations.Remove(anim);
-                }
+            Channel.UnRegister(animation);
+        }
+
+        /// <summary>
+        /// Search all animations for a specific activator and execute them.
+        /// </summary>
+        /// <typeparam name="T">the activator type</typeparam>
+        /// <param name="activateFunc">determine if this activator can activate</param>
+        public void RunActivator<T>(Func<T, bool> activateFunc)
+            where T:AnimationActivation
+        {
+            if (activateFunc == null) throw new ArgumentNullException("activateFunc");
+            foreach (var anim in Animations)
+                foreach (var act in anim.Activations)
+                    if (act is T && act.Enabled && activateFunc((T)act))
+                    {
+                        ExecuteAnimation(anim);
+                        break;
+                    }
         }
 
         /// <summary>

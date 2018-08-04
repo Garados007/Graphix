@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Align.cs" />
+    <Compile Include="DisplayChannel.cs" />
     <Compile Include="FlatPrototype.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Physic\AnimationActivation.cs" />
