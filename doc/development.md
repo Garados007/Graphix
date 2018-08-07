@@ -253,6 +253,11 @@ Logger.Error(e);
 
 The output is automaticly formatted.
 
+### Channels
+
+A channel is a very usefull technique for splitting the ui in different parts. For more information have a look at
+[Display Channel](channel.md).
+
 ## Extend core
 
 Its very easy to extend the core with own prototypes and animations.

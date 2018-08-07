@@ -19,18 +19,16 @@ namespace Graphix.Rendering
         public bool ShowFps { get => FpsRender.Show; set => FpsRender.Show = value; }
 
         public bool VSync { get; set; }
+        
+        public DisplayChannel.ProtectedList<FlatPrototype> Objects => Animation.Channel.Objects;
 
-        public List<FlatPrototype> Objects { get; private set; }
-
-        public Dictionary<string, Status> Status { get; private set; }
+        public Dictionary<string, Status> Status => Animation.Channel.Status;
 
         public event Action LoadAssets;
 
         public Renderer()
         {
             VSync = true;
-            Objects = new List<FlatPrototype>();
-            Status = new Dictionary<string, Status>();
             Animation = new AnimationRuntime();
             RessourceManager = new RessourceManager();
             Animation.SoundPlayer = new SoundPlayer();
@@ -45,34 +43,14 @@ namespace Graphix.Rendering
 
         public Status GetStatus(string fullName)
         {
-            if (fullName == null) return null;
-            var parts = fullName.Split('|');
-            if (!Status.ContainsKey(parts[0])) return null;
-            var st = Status[parts[0]];
-            return st.Find(parts);
+            return Animation.Channel.GetStatus(fullName);
         }
 
         public void Import(PrototypeLoader prototypes)
         {
-            var exp = new PrototypeExporter();
-            exp.ImportFlatten(prototypes);
-            foreach (var obj in exp.Objects)
-            {
-                Objects.Add(obj);
-                LoadAnimations(obj);
-            }
-            foreach (var st in exp.Status)
-                Status[st.Key] = st.Value;
+            Animation.Channel.Import(prototypes);
         }
-
-        void LoadAnimations(FlatPrototype prot)
-        {
-            foreach (var obj in prot.Container)
-                LoadAnimations(obj);
-            foreach (var anim in prot.Animations)
-                Animation.Register(anim);
-        }
-
+        
         internal RenderForm Form { get; private set; }
         internal SharpRender SharpRender { get; private set; }
         internal FpsRenderer FpsRender { get; private set; }
@@ -130,11 +108,9 @@ namespace Graphix.Rendering
             Task.Run(() =>
             {
                 KeyPress?.Invoke(e.KeyChar);
-                ObjectRender.KeyEvent(this, new KeyEvent
-                {
-                    KeyMode = KeyEvent.Mode.Press,
-                    Char = "" + e.KeyChar
-                });
+                Animation.RunActivator<KeyPressActivation>((act) =>
+                    !act.Char.Exists || act.Char.Value == "" + e.KeyChar
+                );
             });
             e.Handled = true;
         }
@@ -144,11 +120,9 @@ namespace Graphix.Rendering
             Task.Run(() =>
             {
                 KeyUp?.Invoke((Keys)e.KeyCode);
-                ObjectRender.KeyEvent(this, new KeyEvent
-                {
-                    KeyMode = KeyEvent.Mode.Up,
-                    Key = (Keys)e.KeyCode
-                });
+                Animation.RunActivator<KeyUpActivation>((act) =>
+                    !act.Key.Exists || act.Key.Value == (Keys)e.KeyCode
+                );
             });
             e.Handled = true;
         }
@@ -159,7 +133,7 @@ namespace Graphix.Rendering
             if (EnableSnapShot && e.KeyCode == System.Windows.Forms.Keys.F7)
             {
                 var pe = new PrototypeExporter();
-                foreach (var st in Status)
+                foreach (var st in Animation.Channel.Status)
                     pe.Status.Add(st.Key, st.Value);
                 foreach (var obj in Objects)
                     pe.Objects.Add(obj);
@@ -170,11 +144,9 @@ namespace Graphix.Rendering
             Task.Run(() =>
             {
                 KeyDown?.Invoke((Keys)e.KeyCode);
-                ObjectRender.KeyEvent(this, new KeyEvent
-                {
-                    KeyMode = KeyEvent.Mode.Down,
-                    Key = (Keys)e.KeyCode
-                });
+                Animation.RunActivator<KeyDownActivation>((act) =>
+                    !act.Key.Exists || act.Key.Value == (Keys)e.KeyCode
+                );
             });
             e.Handled = true;
         }
@@ -222,6 +194,7 @@ namespace Graphix.Rendering
                 Task.WaitAll(preloads.ToArray());
                 loadAssets = false;
                 await Task.Delay(500);
+                Animation.Channel = Animation.Channel; //active inactive channel
                 WaitingRender.Dispose();
                 if (Status.ContainsKey("Main"))
                     CurrentStatus = Status["Main"];
