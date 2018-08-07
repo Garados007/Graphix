@@ -164,7 +164,7 @@ namespace Graphix.Physic
                 {
                     data.CanAnimate = true;
                     data.StartTime = TimeStart.Value;
-                    if (Enable) StartAnimate(data.Runtime);
+                    if (Enable) StartAnimation(data.Runtime);
                 }
                 else data.CanAnimate = false;
             }
@@ -174,7 +174,7 @@ namespace Graphix.Physic
                 {
                     data.CanAnimate = true;
                     data.StartTime = data.LastTileTime + TimeOffset.Value;
-                    if (Enable) StartAnimate(data.Runtime);
+                    if (Enable) StartAnimation(data.Runtime);
                 }
                 else data.CanAnimate = false;
             }
@@ -182,16 +182,39 @@ namespace Graphix.Physic
             {
                 data.CanAnimate = true;
                 data.StartTime = data.CurrentTime;
-                if (Enable) StartAnimate(data.Runtime);
+                if (Enable) StartAnimation(data.Runtime);
             }
         }
 
+        void StartAnimation(AnimationRuntime runtime)
+        {
+            leftRepeat = Repeat.Exists ? Repeat.Value : new RepeatMode(0);
+            StartAnimate(runtime);
+        }
+
+        void FinishAnimation(AnimationRuntimeData data)
+        {
+            if (leftRepeat.None)
+            {
+                data.CanAnimate = false;
+            }
+            else
+            {
+                if (!leftRepeat.Infinite) leftRepeat = new RepeatMode(leftRepeat.Times - 1);
+                data.StartTime = data.CurrentTime;
+                data.CanAnimate = true;
+                StartAnimate(data.Runtime);
+            }
+        }
+
+        RepeatMode leftRepeat;
         /// <summary>
         /// Animate the current effect
         /// </summary>
         /// <param name="data">runtime data</param>
         public void Animate(AnimationRuntimeData data)
         {
+            var finish = false;
             var time = data.CurrentTime - data.StartTime;
             double final;
             if (TimeFinish.Exists)
@@ -199,7 +222,7 @@ namespace Graphix.Physic
                 if (TimeFinish.Value <= data.CurrentTime)
                 {
                     data.LastTileTime = TimeFinish.Value;
-                    data.CanAnimate = false;
+                    finish = true;
                 }
                 final = TimeFinish.Value - TimeStart.Value;
             }
@@ -208,17 +231,18 @@ namespace Graphix.Physic
                 if (TimeDuration.Value <= data.CurrentTime - data.StartTime)
                 {
                     data.LastTileTime = data.StartTime + TimeDuration.Value;
-                    data.CanAnimate = false;
+                    finish = true;
                 }
                 final = TimeDuration.Value;
             }
             else
             {
                 data.LastTileTime = data.StartTime;
-                data.CanAnimate = false;
+                finish = true;
                 final = 0;
             }
             if (Enable) Animate(final == 0 ? 1 : time / final);
+            if (finish) FinishAnimation(data);
         }
 
         /// <summary>
@@ -244,6 +268,7 @@ namespace Graphix.Physic
             TimeFinish = helper.Convert(TimeFinish);
             TimeDuration = helper.Convert(TimeDuration);
             Reverse = helper.Convert(Reverse);
+            Repeat = helper.Convert(Repeat);
             Mode = helper.Convert(Mode);
             Async = helper.Convert(Async);
             Enable = helper.Convert(Enable);
@@ -261,6 +286,7 @@ namespace Graphix.Physic
             eff.TimeFinish = (ValueWrapper<double>)TimeFinish.Clone();
             eff.TimeDuration = (ValueWrapper<double>)TimeDuration.Clone();
             eff.Reverse = (ValueWrapper<bool>)Reverse.Clone();
+            eff.Repeat = (ValueWrapper<RepeatMode>)Repeat.Clone();
             eff.Mode = (ValueWrapper<AnimationMode>)Mode.Clone();
             eff.Async = (ValueWrapper<bool>)Async.Clone();
             eff.Enable = (ValueWrapper<bool>)Enable.Clone();
