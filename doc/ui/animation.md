@@ -135,10 +135,25 @@ The values can be reference values (more [here](variables.md)).
 
 This animation whould start if the channel is changed from the old one to the current one.
 
+The optional attribute `enable` can turn this activator on or off.
 The optional attribute `old` specifiy the old channel name, if omit any will work.
 
 The values can be reference values (more [here](variables.md)).
 
+### Script
+
+```xml
+<Script enabled="true" key="menu-open" />
+```
+
+This animation would start if a script calls the function `$.RunAnimation()` with the given key.
+
+The optional attribute `enable` can turn this activator on or off.
+The optional attribute `key` define on which key this activator has to listen. If no key is not set any calls will work.
+
+The values can be reference values (more [here](variables.md)).
+
+This activator is only accessible with the [script extension](../script/index.md).
 
 ## Animation effects
 
@@ -163,13 +178,13 @@ Each effect has the following optional attributes (they are not used from every 
 
 The time values are measured in seconds.
 
-Hint 1: Some of the effects change a variable. If the variable should referenced trough an id then the attribute `target-id`
+> **Hint:** Some of the effects change a variable. If the variable should referenced trough an id then the attribute `target-id`
 should be used instead of `param`. The `param` attribute gets only the variable name in the group without the prefix `@`.
 Modifing core values and real values are not enabled.
 
-Hint 2: In the preview code of the effects the above defined attributes are omited for better readability.
+> **Hint:** In the preview code of the effects the above defined attributes are omited for better readability.
 
-Hint 3: Each attribute in the effects could be a reference to a variable (except direct linking to animations or prototypes).
+> **Hint:** Each attribute in the effects could be a reference to a variable (except direct linking to animations or prototypes).
 
 ### AInt
 
@@ -340,6 +355,32 @@ Start the specified channel and remove the current one. This channel need to be 
 | attribute | required | value type | Description |
 |-|-|-|-|
 | `name`  | true | `String` | The name of the channel |
+
+### Script
+
+```xml
+<Script code="log(\"Hello World\");" />
+<Script>
+    log("Hello World");
+</Script>
+```
+
+This effect is normaly used with the [script extension](../script/index.md). 
+In JS the function is normaly bound to `Function` attribute of this object.
+But you can use it in you XML UI also. They are two ways of defining the code.
+
+If you define the code in the ui then this code will executed in a seperated context from the other
+ui scripts. If you want to share the context you have to create this object and bind the function
+in your target context.
+
+The script calling functions get two variables:
+
+- `runtime` - The current animation runtime
+- `time` - a value between 0 and 1 for the progress.
+
+This variable names are the same in the ui manual definition.
+
+> **Hint:** It is prefered to create this effect in your script backend.
 
 ## Extend Animation Groups
 

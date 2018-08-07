@@ -7,6 +7,7 @@ A very simple grafic engine for windows. It take use of DirectX over SharpDX, .N
 - [How this engine works](doc/workflow.md)
 - [Backend game development](doc/development.md)
 - [Frontend game development (UI)](doc/ui/index.md)
+- [Extended Script Support (JS)](doc/script/index.md)
 
 Simple example project: [Graphix.DemoApp](Graphix.DemoApp/Program.cs)
 

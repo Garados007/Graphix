@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphix.Rendering", "Graphi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphix.DemoApp", "Graphix.DemoApp\Graphix.DemoApp.csproj", "{5190F8D9-A3BA-4791-95E9-CA0EDE4451C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphix.Script", "Graphix.Script\Graphix.Script.csproj", "{E22E77E9-94FD-417B-869B-AAF22579D0D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5190F8D9-A3BA-4791-95E9-CA0EDE4451C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5190F8D9-A3BA-4791-95E9-CA0EDE4451C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5190F8D9-A3BA-4791-95E9-CA0EDE4451C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E22E77E9-94FD-417B-869B-AAF22579D0D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E22E77E9-94FD-417B-869B-AAF22579D0D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E22E77E9-94FD-417B-869B-AAF22579D0D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E22E77E9-94FD-417B-869B-AAF22579D0D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

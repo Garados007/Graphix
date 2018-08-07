@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0DCE93B0-EFFF-4E37-BFF2-1C9138D8B536}</ProjectGuid>
+    <ProjectGuid>{E22E77E9-94FD-417B-869B-AAF22579D0D3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Graphix</RootNamespace>
-    <AssemblyName>Graphix</AssemblyName>
+    <AssemblyName>Graphix.Script</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,17 +29,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Jint, Version=0.0.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jint.2.11.58\lib\net451\Jint.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,38 +43,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Align.cs" />
-    <Compile Include="DisplayChannel.cs" />
-    <Compile Include="FlatPrototype.cs" />
-    <Compile Include="Internal\PrototypeLoaderAccess.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="Physic\AnimationActivation.cs" />
-    <Compile Include="Physic\AnimationEffect.cs" />
-    <Compile Include="Physic\AnimationGroup.cs" />
-    <Compile Include="Physic\AnimationMode.cs" />
-    <Compile Include="Physic\AnimationRuntime.cs" />
-    <Compile Include="Physic\AnimationRuntimeData.cs" />
-    <Compile Include="Physic\ISoundPlayer.cs" />
-    <Compile Include="Physic\Keys.cs" />
+    <Compile Include="Physic\ScriptEffect.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PrototypeExporter.cs" />
-    <Compile Include="PrototypeLoader.cs" />
-    <Compile Include="Prototypes\AnimImage.cs" />
-    <Compile Include="Prototypes\DisplayBase.cs" />
-    <Compile Include="Prototypes\Ellipse.cs" />
-    <Compile Include="Prototypes\Image.cs" />
-    <Compile Include="Prototypes\Line.cs" />
-    <Compile Include="Prototypes\Math\Calc.cs" />
-    <Compile Include="Prototypes\Math\Check.cs" />
-    <Compile Include="Prototypes\Math\If.cs" />
-    <Compile Include="Prototypes\Math\MathValue.cs" />
-    <Compile Include="Prototypes\PrototypeBase.cs" />
-    <Compile Include="Prototypes\Rect.cs" />
-    <Compile Include="Prototypes\RenderingBase.cs" />
-    <Compile Include="Prototypes\Text.cs" />
-    <Compile Include="ScreenPos.cs" />
-    <Compile Include="Status.cs" />
-    <Compile Include="ValueWrapper.cs" />
+    <Compile Include="Script\ScriptAccess.cs" />
+    <Compile Include="Physic\ScriptActivator.cs" />
+    <Compile Include="Script\ScriptCore.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Graphix\Graphix.csproj">
+      <Project>{0dce93b0-efff-4e37-bff2-1c9138d8b536}</Project>
+      <Name>Graphix</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

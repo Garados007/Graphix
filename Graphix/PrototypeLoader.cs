@@ -18,7 +18,7 @@ namespace Graphix
     {
         #region Static Lib
 
-        static List<Type> dotnetPrototypes = new List<Type>();
+        internal static List<Type> dotnetPrototypes = new List<Type>();
         /// <summary>
         /// List of all core Prototypes
         /// </summary>
@@ -35,10 +35,10 @@ namespace Graphix
                 dotnetPrototypes.Add(type);
         }
 
-        static Dictionary<string, Type> parameterTypes = new Dictionary<string, Type>();
-        static Dictionary<string, Delegate> parameterConverter = new Dictionary<string, Delegate>();
+        internal static Dictionary<string, Type> parameterTypes = new Dictionary<string, Type>();
+        internal static Dictionary<string, Delegate> parameterConverter = new Dictionary<string, Delegate>();
         public static Dictionary<string, Type> ParameterTypes => parameterTypes.ToDictionary((e) => e.Key, (e) => e.Value);
-        static Dictionary<string, Type> mathParameterTypes = new Dictionary<string, Type>();
+        internal static Dictionary<string, Type> mathParameterTypes = new Dictionary<string, Type>();
 
         /// <summary>
         /// Register a parameter type that can used as the type of any value in the ui XML definition
@@ -61,7 +61,7 @@ namespace Graphix
         /// </summary>
         public static Dictionary<string, IValueWrapper> SystemValues { get; private set; }
 
-        private static Dictionary<string, Tuple<Type, Delegate>> activators = new Dictionary<string, Tuple<Type, Delegate>>();
+        internal static Dictionary<string, Tuple<Type, Delegate>> activators = new Dictionary<string, Tuple<Type, Delegate>>();
         /// <summary>
         /// Register a <see cref="AnimationActivation"/> to use in ui XML definition
         /// </summary>
@@ -74,7 +74,7 @@ namespace Graphix
                 activators.Add(name, new Tuple<Type, Delegate>(typeof(T), dataFiller));
         }
 
-        private static Dictionary<string, Tuple<Type, Delegate>> effects = new Dictionary<string, Tuple<Type, Delegate>>();
+        internal static Dictionary<string, Tuple<Type, Delegate>> effects = new Dictionary<string, Tuple<Type, Delegate>>();
         /// <summary>
         /// Register a <see cref="AnimationEffect"/> to use in ui XML definition
         /// </summary>
@@ -226,18 +226,7 @@ namespace Graphix
             #endregion
             #region Effect
 
-            var effectBase = new Action<PrototypeLoader, PrototypeBase, AnimationEffect, XmlNode>((pl, pb, e, node) =>
-            {
-                pl.SetParameter(node.Attributes["repeat"]?.Value, e.Repeat, pb, false, parameterConverter["Repeat"]);
-                pl.SetParameter(node.Attributes["reverse"]?.Value, e.Reverse, pb, false, parameterConverter["Bool"]);
-                pl.SetParameter(node.Attributes["time-start"]?.Value, e.TimeStart, pb, false, parameterConverter["Double"]);
-                pl.SetParameter(node.Attributes["time-offset"]?.Value, e.TimeOffset, pb, false, parameterConverter["Double"]);
-                pl.SetParameter(node.Attributes["time-duration"]?.Value, e.TimeDuration, pb, false, parameterConverter["Double"]);
-                pl.SetParameter(node.Attributes["time-finish"]?.Value, e.TimeFinish, pb, false, parameterConverter["Double"]);
-                pl.SetParameter(node.Attributes["mode"]?.Value, e.Mode, pb, false, parameterConverter["AnimMode"]);
-                pl.SetParameter(node.Attributes["enable"]?.Value, e.Enable, pb, false, parameterConverter["Bool"]);
-                pl.SetParameter(node.Attributes["async"]?.Value, e.Async, pb, false, parameterConverter["Bool"]);
-            });
+            var effectBase = new Action<PrototypeLoader, PrototypeBase, AnimationEffect, XmlNode>(EffectBase);
             var fetchTarget = new Func<PrototypeLoader, PrototypeBase, XmlNode, IValueWrapper>((pl, pb, node) =>
             {
                 if (node.Attributes["target-id"] != null)
@@ -329,6 +318,19 @@ namespace Graphix
             });
 
             #endregion
+        }
+
+        internal static void EffectBase(PrototypeLoader pl, PrototypeBase pb, AnimationEffect e, XmlNode node)
+        {
+            pl.SetParameter(node.Attributes["repeat"]?.Value, e.Repeat, pb, false, parameterConverter["Repeat"]);
+            pl.SetParameter(node.Attributes["reverse"]?.Value, e.Reverse, pb, false, parameterConverter["Bool"]);
+            pl.SetParameter(node.Attributes["time-start"]?.Value, e.TimeStart, pb, false, parameterConverter["Double"]);
+            pl.SetParameter(node.Attributes["time-offset"]?.Value, e.TimeOffset, pb, false, parameterConverter["Double"]);
+            pl.SetParameter(node.Attributes["time-duration"]?.Value, e.TimeDuration, pb, false, parameterConverter["Double"]);
+            pl.SetParameter(node.Attributes["time-finish"]?.Value, e.TimeFinish, pb, false, parameterConverter["Double"]);
+            pl.SetParameter(node.Attributes["mode"]?.Value, e.Mode, pb, false, parameterConverter["AnimMode"]);
+            pl.SetParameter(node.Attributes["enable"]?.Value, e.Enable, pb, false, parameterConverter["Bool"]);
+            pl.SetParameter(node.Attributes["async"]?.Value, e.Async, pb, false, parameterConverter["Bool"]);
         }
 
         #endregion
@@ -494,6 +496,7 @@ namespace Graphix
         /// <param name="file">the real file name (absolute or relative)</param>
         public void Load(string file)
         {
+            file = GetLibPath(file);
             file = new FileInfo(file).FullName;
             LoadedFiles.Add(file);
             var settings = new XmlReaderSettings();
@@ -960,7 +963,7 @@ namespace Graphix
         /// <param name="current">current Prototype</param>
         /// <param name="forceref">force to have a reference</param>
         /// <param name="customConverter">convert the string to its value</param>
-        void SetParameter(string value, IValueWrapper target, PrototypeBase current, bool forceref = false, Delegate customConverter = null)
+        internal void SetParameter(string value, IValueWrapper target, PrototypeBase current, bool forceref = false, Delegate customConverter = null)
         {
             if (value == null)
             {
