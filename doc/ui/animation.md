@@ -334,6 +334,20 @@ Start a sound file (this effect will not wait until its finished). Its recommend
 | `file`  | true | `String` | The path to the sound file |
 | `volume` | false | `Double` | The volume modifier for the sound file |
 
+### StopSound
+
+```xml
+<StopSound file="audio/crash.wav" />
+```
+
+Stop all running sound file with this file name.
+
+**Attributes:**
+
+| attribute | required | value type | Description |
+|-|-|-|-|
+| `file`  | true | `String` | The path to the sound file |
+
 ### Close
 
 ```xml

@@ -14,6 +14,7 @@ namespace Graphix.Rendering
         Dictionary<string, string> FileNameLookup = new Dictionary<string, string>();
         Dictionary<string, SoundData> Voices = new Dictionary<string, SoundData>();
         Dictionary<string, Queue<SourceVoice>> CurrentVoices = new Dictionary<string, Queue<SourceVoice>>();
+        Dictionary<string, List<SourceVoice>> PlayingVoices = new Dictionary<string, List<SourceVoice>>();
 
         public SoundPlayer()
         {
@@ -26,6 +27,7 @@ namespace Graphix.Rendering
             foreach (var v in CurrentVoices)
                 while (v.Value.Count > 0)
                     v.Value.Dequeue().Dispose();
+            PlayingVoices.Clear();
             Voices.Clear();
             masteringVoice.Dispose();
             xaudio.Dispose();
@@ -73,9 +75,26 @@ namespace Graphix.Rendering
             sourceVoice.StreamEnd += () =>
             {
                 CurrentVoices[file].Enqueue(sourceVoice);
+                PlayingVoices[file].Remove(sourceVoice);
             };
             sourceVoice.SetVolume((float)volume);
+            if (!PlayingVoices.ContainsKey(file))
+                PlayingVoices.Add(file, new List<SourceVoice>());
+            PlayingVoices[file].Add(sourceVoice);
             sourceVoice.Start();
+        }
+
+        public void StopSound(string file)
+        {
+            if (!FileNameLookup.ContainsKey(file))
+                file = FileNameLookup[file] = new System.IO.FileInfo(file).FullName;
+            else file = FileNameLookup[file];
+            PlayingVoices[file].ForEach((v) =>
+            {
+                v.Stop();
+                CurrentVoices[file].Enqueue(v);
+            });
+            PlayingVoices.Remove(file);
         }
 
         class SoundData

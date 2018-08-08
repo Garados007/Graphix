@@ -1658,7 +1658,104 @@ namespace Graphix.Physic
                 new Task(() => runtime.SoundPlayer.PlaySound(File.Value, Volume.Value)).Start();
         }
     }
-    
+
+    /// <summary>
+    /// Stop a sound file
+    /// </summary>
+    public class StopSound : AnimationEffect
+    {
+        /// <summary>
+        /// The path of the specific file
+        /// </summary>
+        public ValueWrapper<String> File { get; set; }
+
+        /// <summary>
+        /// Stop a sound file
+        /// </summary>
+        public StopSound()
+        {
+            File = new ValueWrapper<string>();
+        }
+
+        /// <summary>
+        /// Clones the added data of this effect
+        /// </summary>
+        /// <returns>the clone</returns>
+        protected override AnimationEffect ProtClone()
+        {
+            var eff = new StopSound();
+            eff.File = (ValueWrapper<string>)File.Clone();
+            return eff;
+        }
+
+        /// <summary>
+        /// Move the targets of the used values
+        /// </summary>
+        /// <param name="helper">The flatten helper</param>
+        public override void MoveTargets(PrototypeFlattenerHelper helper)
+        {
+            base.MoveTargets(helper);
+            File = helper.Convert(File);
+        }
+
+        /// <summary>
+        /// Convert this effect to its XML representation
+        /// </summary>
+        /// <param name="xml">The target XML document</param>
+        /// <param name="dict">The dictionary for variable name support</param>
+        /// <returns>The exported XML node</returns>
+        public override XmlNode ToXml(XmlDocument xml, PrototypeExporter.Dict dict)
+        {
+            var node = xml.CreateElement("StopSound");
+            AddParamsToXml(xml, node, dict);
+            return node;
+        }
+
+        /// <summary>
+        /// Add its own parameters to the xml node
+        /// </summary>
+        /// <param name="xml">the target XML document</param>
+        /// <param name="node">the current XML node</param>
+        /// <param name="dict">Dictionary for variable name support</param>
+        protected override void AddParamsToXml(XmlDocument xml, XmlNode node, PrototypeExporter.Dict dict)
+        {
+            base.AddParamsToXml(xml, node, dict);
+            AddParamToXml(xml, node, File, "file", dict);
+        }
+
+        /// <summary>
+        /// Get a list of all used variables
+        /// </summary>
+        /// <returns>list of used variables</returns>
+        public override IValueWrapper[] GetValueWrapper()
+        {
+            return new IValueWrapper[]
+               {
+                TimeStart, TimeOffset, TimeFinish, TimeDuration, Reverse, Repeat, Async, Enable,
+                File
+               };
+        }
+
+        /// <summary>
+        /// Animate the current effect with the current progress
+        /// </summary>
+        /// <param name="time">the current progress (between 0 and 1)</param>
+        protected override void Animate(double time)
+        {
+        }
+
+        /// <summary>
+        /// inform this effect that its execution whould start now
+        /// </summary>
+        /// <param name="runtime">current animation runtime</param>
+        protected override void StartAnimate(AnimationRuntime runtime)
+        {
+            var name = File.Value;
+            if (runtime.SoundPlayer != null)
+                new Task(() => runtime.SoundPlayer.StopSound(File.Value)).Start();
+        }
+    }
+
     /// <summary>
     /// Close the application
     /// </summary>

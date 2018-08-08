@@ -44,7 +44,7 @@ namespace Graphix.Script
             //log stuff in the local log file
             engine.SetValue("log", new Action<string>(JsLog));
             //log an exception
-            engine.SetValue("log", new Action<Exception>(JsError));
+            engine.SetValue("error", new Action<Exception>(JsError));
             //execute a funtion in some ms. This function is simular to the JS on web
             engine.SetValue("setTimeout", new Func<Action, int, int>(SetTimeout));
             //execute a funtion repeadly after some ms. This function is simular to the JS on web

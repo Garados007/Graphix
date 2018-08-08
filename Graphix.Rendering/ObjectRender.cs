@@ -25,10 +25,12 @@ namespace Graphix.Rendering
 
         public void Click(Renderer source, Vector2 point, Size2 screen, Physic.ClickButton button)
         {
-
-            foreach (var obj in source.Objects)
+            for (int i = source.Objects.Count - 1; i >= 0; i--)
+            {
+                var obj = source.Objects[i];
                 if (ClickObject(source, point, obj, new RectangleF(0, 0, screen.Width, screen.Height), screen, button))
                     return;
+            }
         }
 
         bool ClickObject(Renderer source, Vector2 point, FlatPrototype prot, RectangleF parent, Size2 screen, Physic.ClickButton button)
@@ -38,9 +40,12 @@ namespace Graphix.Rendering
             var found = false;
             var force = prot.Parameter.ContainsKey("MouseSolid") && (bool)prot.Parameter["MouseSolid"].Value;
             if (!force || contains)
-                foreach (var sub in prot.Container)
+                for (int i = prot.Container.Count - 1; i >= 0; i--)
+                {
+                    var sub = prot.Container[i];
                     if (ClickObject(source, point, sub, bounds, screen, button))
                         return true;
+                }
             if (contains)
                 foreach (var anim in prot.Animations)
                     foreach (var act in anim.Activations)
@@ -51,7 +56,6 @@ namespace Graphix.Rendering
                                 continue;
                             source.Animation.ExecuteAnimation(anim);
                             found = true;
-                            break;
                         }
             return force && found;
         }

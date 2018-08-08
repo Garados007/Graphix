@@ -307,6 +307,11 @@ namespace Graphix
                 pl.SetParameter(node.Attributes["file"]?.Value, e.File, pb, false, parameterConverter["String"]);
                 pl.SetParameter(node.Attributes["volume"]?.Value, e.Volume, pb, false, parameterConverter["Double"]);
             });
+            AddEffect<StopSound>("StopSound", (pl, pb, e, node) =>
+            {
+                effectBase(pl, pb, e, node);
+                pl.SetParameter(node.Attributes["file"]?.Value, e.File, pb, false, parameterConverter["String"]);
+            });
             AddEffect<CloseEffect>("Close", (pl, pb, e, node) =>
             {
                 effectBase(pl, pb, e, node);
