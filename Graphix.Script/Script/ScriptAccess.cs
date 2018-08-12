@@ -242,7 +242,19 @@ namespace Graphix.Script
             {
                 data
             });
+            var fi = new FileInfo(fileName);
+            if (!fi.Directory.Exists) fi.Directory.Create();
             File.WriteAllText(fileName, code.AsString());
+        }
+
+        /// <summary>
+        /// Adds the method to <see cref="AnimAction"/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="effect"></param>
+        public void AddAnimationAction(string name, Action effect)
+        {
+            AnimAction.AddAction(name, effect);
         }
     }
 }

@@ -89,11 +89,12 @@ namespace Graphix.Rendering
             if (!FileNameLookup.ContainsKey(file))
                 file = FileNameLookup[file] = new System.IO.FileInfo(file).FullName;
             else file = FileNameLookup[file];
-            PlayingVoices[file].ForEach((v) =>
-            {
-                v.Stop();
-                CurrentVoices[file].Enqueue(v);
-            });
+            if (PlayingVoices.ContainsKey(file))
+                PlayingVoices[file].ForEach((v) =>
+                {
+                    v.Stop();
+                    CurrentVoices[file].Enqueue(v);
+                });
             PlayingVoices.Remove(file);
         }
 

@@ -121,3 +121,16 @@ $.SaveData("data/savegame.json", {
 native JSON converter. Graphix types and methods cannot be converted!
 
 > **Hint:** This data is stored as plain text. There is not security for user manipulation.
+
+## _void_ $.AddAnimationAction(_string_ name, _method_ effect)
+
+Add this method to the global [AnimAction](../../Graphix/Physic/AnimationEffect.cs) Effect Routine.
+This Method will be called each time an effect call any actions with the given name.
+
+```js
+$.AddAnimationAction("open-menu", function () {
+    //do some stuff
+});
+```
+
+

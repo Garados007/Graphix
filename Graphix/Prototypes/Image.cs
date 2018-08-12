@@ -10,6 +10,8 @@
         /// </summary>
         public ValueWrapper<string> Url { get; private set; }
 
+        public ValueWrapper<bool> Interpolate { get; private set; }
+
         /// <summary>
         /// Creates a Prototype for an image
         /// </summary>
@@ -17,6 +19,8 @@
         {
             RenderName = GetType().FullName;
             Parameter.Add("Url", Url = new ValueWrapper<string>());
+            Parameter.Add("Interpolate", Interpolate = new ValueWrapper<bool>());
+            Interpolate.Value = true;
         }
     }
 }

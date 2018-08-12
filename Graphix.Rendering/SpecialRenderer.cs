@@ -92,9 +92,13 @@ namespace Graphix.Rendering
         public override void Render(RenderArgs args)
         {
             var url = args.Prototype.Parameter.ContainsKey("Url") ? args.Prototype.Parameter["Url"].Value as string : null;
+            bool interpolate = true;
+            if (args.Prototype.Parameter.TryGetValue("Interpolate", out IValueWrapper wrapper))
+                interpolate = (bool)wrapper.Value;
             var bitmap = url == null ? null : Ressources.GetBitmap(url);
             if (bitmap != null)
-                args.Context.DrawBitmap(bitmap, args.Bounds, 1.0f, BitmapInterpolationMode.Linear);
+                args.Context.DrawBitmap(bitmap, args.Bounds, 1.0f, 
+                    interpolate ? BitmapInterpolationMode.Linear : BitmapInterpolationMode.NearestNeighbor);
         }
     }
 

@@ -33,7 +33,7 @@ namespace Graphix.Script
         {
             config = config ?? new CoreConfig();
             Runtime = runtime ?? throw new ArgumentNullException("runtime");
-            engine = new Engine();
+            engine = new Engine((o)=> o.DebugMode(config.DebugMode));
             Access = new ScriptAccess(this);
 
             engine.SetValue(config.AccessVariable, Access);
@@ -197,11 +197,17 @@ namespace Graphix.Script
         public string AccessVariable { get; set; }
 
         /// <summary>
+        /// Run the scripts in a debug context.
+        /// </summary>
+        public bool DebugMode { get; set; }
+
+        /// <summary>
         /// Created <see cref="CoreConfig"/>
         /// </summary>
         public CoreConfig()
         {
             AccessVariable = "$";
+            DebugMode = false;
         }
     }
 }
